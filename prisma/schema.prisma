@@ -132,6 +132,7 @@ model EventAttendee {
   volunteerId String
   volunteer   Volunteer        @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
   status      AttendanceStatus @default(RESERVE)
+  isExternal  Boolean          @default(false)
   updatedById String?
   updatedAt   DateTime         @updatedAt
 

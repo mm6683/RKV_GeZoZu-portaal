@@ -37,7 +37,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const attendee = await prisma.eventAttendee.upsert({
     where: { eventId_volunteerId: { eventId: params.id, volunteerId } },
     update: {},
-    create: { eventId: params.id, volunteerId, status: 'RESERVE' },
+    create: { eventId: params.id, volunteerId, status: 'RESERVE', isExternal: true },
   })
 
   return NextResponse.json(attendee, { status: 201 })
