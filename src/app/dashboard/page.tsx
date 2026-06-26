@@ -77,16 +77,16 @@ export default function Dashboard() {
             <div className="flex items-center gap-2">
               <div className="flex bg-white rounded-xl border border-rkv-gray-mid overflow-hidden">
                 <button onClick={() => setView('list')}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === 'list' ? 'bg-rkv-red text-white' : 'text-rkv-teal hover:bg-rkv-gray'}`}>
+                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === 'list' ? 'bg-cta-blue text-white' : 'text-rkv-teal hover:bg-rkv-gray'}`}>
                   Lijst
                 </button>
                 <button onClick={() => setView('calendar')}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === 'calendar' ? 'bg-rkv-red text-white' : 'text-rkv-teal hover:bg-rkv-gray'}`}>
+                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === 'calendar' ? 'bg-cta-blue text-white' : 'text-rkv-teal hover:bg-rkv-gray'}`}>
                   Kalender
                 </button>
               </div>
               {me.isAdmin && (
-                <button onClick={() => router.push('/admin/events/create')} className="btn-red text-sm py-1.5 px-3">
+                <button onClick={() => router.push('/admin/events/create')} className="btn-blue text-sm py-1.5 px-3">
                   + Nieuw event
                 </button>
               )}
@@ -165,7 +165,7 @@ function CalendarView({ events, month, onMonthChange, onEventClick }: {
               </div>
               {evs.slice(0, 2).map(e => (
                 <button key={e.id} onClick={() => onEventClick(e.id)}
-                  className="w-full text-left text-[10px] bg-rkv-red text-white rounded px-1 py-0.5 mb-0.5 truncate leading-tight hover:bg-rkv-red-dark"
+                  className="w-full text-left text-[10px] bg-cta-blue text-white rounded px-1 py-0.5 mb-0.5 truncate leading-tight hover:bg-rkv-red-dark"
                   title={e.naam}>{e.naam}</button>
               ))}
               {evs.length > 2 && <div className="text-[10px] text-rkv-teal text-center">+{evs.length - 2}</div>}

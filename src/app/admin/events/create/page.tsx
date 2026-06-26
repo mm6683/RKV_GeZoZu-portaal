@@ -156,7 +156,7 @@ export default function CreateEventPage() {
 
         <div className="flex gap-3">
           <button onClick={() => router.push('/dashboard')} className="btn-ghost flex-1">Annuleren</button>
-          <button onClick={handleSubmit} disabled={saving} className="btn-red flex-1 text-base py-3">
+          <button onClick={handleSubmit} disabled={saving} className="btn-blue flex-1 text-base py-3">
             {saving ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

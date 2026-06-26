@@ -53,7 +53,7 @@ export default function ArchivePage() {
               {e.naam}
             </p>
             {e.isCancelled && (
-              <span className="badge bg-rkv-red text-white text-xs flex-shrink-0">Geannuleerd</span>
+              <span className="badge bg-cta-blue text-white text-xs flex-shrink-0">Geannuleerd</span>
             )}
           </div>
           <p className="text-sm text-rkv-teal">
@@ -86,14 +86,14 @@ export default function ArchivePage() {
         {/* Tabs */}
         <div className="flex bg-white rounded-xl border border-rkv-gray-mid overflow-hidden w-fit">
           <button onClick={() => setTab('archief')}
-            className={`px-5 py-2.5 text-sm font-medium transition-colors ${tab === 'archief' ? 'bg-rkv-red text-white' : 'text-rkv-teal hover:bg-rkv-gray'}`}>
+            className={`px-5 py-2.5 text-sm font-medium transition-colors ${tab === 'archief' ? 'bg-cta-blue text-white' : 'text-rkv-teal hover:bg-rkv-gray'}`}>
             Voorbije events
           </button>
           <button onClick={() => setTab('annulaties')}
-            className={`px-5 py-2.5 text-sm font-medium transition-colors flex items-center gap-2 ${tab === 'annulaties' ? 'bg-rkv-red text-white' : 'text-rkv-teal hover:bg-rkv-gray'}`}>
+            className={`px-5 py-2.5 text-sm font-medium transition-colors flex items-center gap-2 ${tab === 'annulaties' ? 'bg-cta-blue text-white' : 'text-rkv-teal hover:bg-rkv-gray'}`}>
             Annulaties
             {annulaties.length > 0 && (
-              <span className={`text-xs rounded-full px-1.5 py-0.5 ${tab === 'annulaties' ? 'bg-white/30' : 'bg-rkv-red text-white'}`}>
+              <span className={`text-xs rounded-full px-1.5 py-0.5 ${tab === 'annulaties' ? 'bg-white/30' : 'bg-cta-blue text-white'}`}>
                 {annulaties.length}
               </span>
             )}

@@ -176,7 +176,7 @@ export default function EditEventPage() {
           </button>
           <div className="flex-1" />
           <button onClick={() => router.push(`/events/${id}`)} className="btn-ghost">Annuleren</button>
-          <button onClick={handleSave} disabled={saving} className="btn-red">
+          <button onClick={handleSave} disabled={saving} className="btn-blue">
             {saving ? 'Opslaan…' : 'Opslaan'}
           </button>
         </div>

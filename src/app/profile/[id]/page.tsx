@@ -50,7 +50,7 @@ export default function ProfilePage() {
         <p className="text-5xl mb-4">🔒</p>
         <h1 className="text-xl font-bold text-rkv-teal-dark mb-2">Geen toegang</h1>
         <p className="text-rkv-teal mb-6">Je kan enkel je eigen profiel bekijken.</p>
-        <button onClick={() => router.push(`/profile/${me?.id}`)} className="btn-red">
+        <button onClick={() => router.push(`/profile/${me?.id}`)} className="btn-blue">
           Mijn profiel bekijken
         </button>
       </div>
@@ -113,7 +113,7 @@ export default function ProfilePage() {
               <div className="mt-3 flex items-center gap-2 flex-wrap">
                 <RankBadge rank={profile.rank} size="lg" />
                 {profile.isAdmin && (
-                  <span className="badge bg-rkv-red text-white text-xs px-2.5 py-1">Admin</span>
+                  <span className="badge bg-cta-blue text-white text-xs px-2.5 py-1">Admin</span>
                 )}
                 {profile.isExternal && (
                   <span className="badge bg-rkv-teal text-white text-xs px-2.5 py-1">Extern</span>

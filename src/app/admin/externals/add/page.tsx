@@ -78,7 +78,7 @@ export default function AddExternalPage() {
           <button onClick={() => { setSaved(null); setForm({ rkvId: '', voornaam: '', naam: '', hoofdentiteit: '', emailWerk: '', gsm: '' }) }} className="btn-outline">
             Nog een toevoegen
           </button>
-          <button onClick={() => router.push('/admin')} className="btn-red">
+          <button onClick={() => router.push('/admin')} className="btn-blue">
             Terug naar admin
           </button>
         </div>
@@ -148,7 +148,7 @@ export default function AddExternalPage() {
 
           <div className="flex gap-3 pt-2">
             <button onClick={() => router.push('/admin')} className="btn-ghost flex-1">Annuleren</button>
-            <button onClick={handleSubmit} disabled={saving} className="btn-red flex-1">
+            <button onClick={handleSubmit} disabled={saving} className="btn-blue flex-1">
               {saving ? 'Toevoegen…' : 'Externe toevoegen'}
             </button>
           </div>

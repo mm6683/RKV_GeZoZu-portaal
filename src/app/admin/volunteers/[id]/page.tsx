@@ -260,7 +260,7 @@ export default function AdminVolunteerDetail() {
           </button>
           <div className="flex-1" />
           <button onClick={() => router.push('/admin')} className="btn-ghost">Annuleren</button>
-          <button onClick={save} disabled={saving} className="btn-red px-8">
+          <button onClick={save} disabled={saving} className="btn-blue px-8">
             {saving ? 'Opslaan…' : saved ? '✓ Opgeslagen!' : 'Opslaan'}
           </button>
         </div>

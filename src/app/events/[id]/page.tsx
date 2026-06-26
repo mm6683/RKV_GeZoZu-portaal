@@ -124,7 +124,7 @@ export default function EventDetailPage() {
 
           <div className="flex items-start justify-between gap-3">
             <div>
-              <div className="inline-flex items-center gap-2 bg-rkv-red text-white text-sm font-medium rounded-lg px-3 py-1 mb-3">
+              <div className="inline-flex items-center gap-2 bg-cta-blue text-white text-sm font-medium rounded-lg px-3 py-1 mb-3">
                 📅 {datum.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </div>
               <h1 className="text-2xl font-bold text-rkv-teal-dark">{event.naam}</h1>

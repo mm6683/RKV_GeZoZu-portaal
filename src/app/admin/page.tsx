@@ -48,7 +48,7 @@ export default function AdminPage() {
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-rkv-teal-dark">Admin paneel</h1>
-          <button onClick={() => router.push('/admin/volunteers/create')} className="btn-red text-sm">
+          <button onClick={() => router.push('/admin/volunteers/create')} className="btn-blue text-sm">
             + Vrijwilliger toevoegen
           </button>
         </div>
@@ -83,7 +83,7 @@ export default function AdminPage() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  filter === f ? 'bg-rkv-red text-white' : 'bg-rkv-gray text-rkv-teal hover:bg-rkv-gray-mid'
+                  filter === f ? 'bg-cta-blue text-white' : 'bg-rkv-gray text-rkv-teal hover:bg-rkv-gray-mid'
                 }`}
               >
                 {f === 'all' ? 'Alle' : f === 'gezozu' ? 'GeZoZu' : 'Externen'}
@@ -107,7 +107,7 @@ export default function AdminPage() {
                     <span className="font-bold text-rkv-teal-dark group-hover:text-rkv-red transition-colors">
                       {v.volledigeNaam}
                     </span>
-                    {v.isAdmin && <span className="badge bg-rkv-red text-white text-xs">Admin</span>}
+                    {v.isAdmin && <span className="badge bg-cta-blue text-white text-xs">Admin</span>}
                     {v.isExternal && <span className="badge bg-rkv-teal text-white text-xs">Extern</span>}
                     {v.isBlocked && <span className="badge bg-gray-400 text-white text-xs">Geblokkeerd</span>}
                   </div>
