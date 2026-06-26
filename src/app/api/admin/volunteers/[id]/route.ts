@@ -93,3 +93,19 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const { passwordHash, ...safe } = updated
   return NextResponse.json({ ...safe, hasPassword: !!passwordHash })
 }
+
+export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getSession()
+  if (!session.isAuthenticated) return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
+  if (!session.isAdmin) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
+
+  // Verwijder de zelfverwijzende relatie zodat de FK geen fout geeft
+  await prisma.volunteer.updateMany({
+    where: { addedById: params.id },
+    data: { addedById: null },
+  })
+
+  await prisma.volunteer.delete({ where: { id: params.id } })
+
+  return NextResponse.json({ ok: true })
+}
