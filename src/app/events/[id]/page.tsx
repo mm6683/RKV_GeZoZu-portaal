@@ -115,7 +115,7 @@ export default function EventDetailPage() {
       `SUMMARY:${esc(event.naam)}`,
       `DESCRIPTION:${esc(descLines.join('\n'))}`,
       `LOCATION:${esc(location)}`,
-      'ORGANIZER;CN=Rode Kruis Vlaanderen:mailto:noreply@gezozu.rodekruis.be',
+      'ORGANIZER;CN=Rode Kruis Vlaanderen:mailto:noreply@rodekruis.be',
       'STATUS:CONFIRMED',
       'END:VEVENT',
       'END:VCALENDAR',
