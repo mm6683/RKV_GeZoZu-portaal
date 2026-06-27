@@ -99,6 +99,7 @@ model Event {
   datum            DateTime
   beginUur         String
   eindUur          String
+  eindDatum        DateTime?
   plaats           String
 
   afspreekplaats   String?

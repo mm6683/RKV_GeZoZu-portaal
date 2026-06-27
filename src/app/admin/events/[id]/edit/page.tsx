@@ -30,13 +30,36 @@ export default function EditEventPage() {
         afspreekGemeente: ev.afspreekGemeente || '',
         minHulpverleners: ev.minHulpverleners.toString(),
         minRank: ev.minRank || '',
+        eindDatum: ev.eindDatum
+          ? new Date(ev.eindDatum).toISOString().split('T')[0]
+          : d.toISOString().split('T')[0],
         opmerkingen: ev.opmerkingen || '', isActief: ev.isActief,
       })
     }
     load()
   }, [id])
 
-  function set(field: string, value: any) { setForm((f: any) => ({ ...f, [field]: value })) }
+  function set(field: string, value: any) {
+    setForm((f: any) => {
+      const updated = { ...f, [field]: value }
+
+      // Sync end date when start date changes (if they were on the same day)
+      if (field === 'datum' && typeof value === 'string') {
+        if (!f.eindDatum || f.eindDatum === f.datum) updated.eindDatum = value
+      }
+
+      // Auto-advance end date to next day when end time is before start time on the same day
+      if ((field === 'eindUur' || field === 'beginUur') && typeof value === 'string') {
+        if (updated.beginUur && updated.eindUur && updated.eindUur < updated.beginUur && updated.eindDatum === updated.datum) {
+          const d = new Date(updated.datum + 'T12:00:00')
+          d.setDate(d.getDate() + 1)
+          updated.eindDatum = d.toISOString().split('T')[0]
+        }
+      }
+
+      return updated
+    })
+  }
 
   function mapsEmbedUrl() {
     const parts = [
@@ -56,6 +79,7 @@ export default function EditEventPage() {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         naam: form.naam, datum: form.datum, beginUur: form.beginUur, eindUur: form.eindUur,
+        eindDatum: form.eindDatum || form.datum,
         plaats: form.plaats, afspreekplaats: form.afspreekplaats || null,
         afspreekStraat: form.afspreekStraat || null, afspreekNummer: form.afspreekNummer || null,
         afspreekPostcode: form.afspreekPostcode || null, afspreekGemeente: form.afspreekGemeente || null,
@@ -96,7 +120,7 @@ export default function EditEventPage() {
             <label className="label">Naam <span className="text-rkv-red">*</span></label>
             <input className="input" value={form.naam} onChange={e => set('naam', e.target.value)} />
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-3">
             <div>
               <label className="label">Datum <span className="text-rkv-red">*</span></label>
               <input className="input" type="date" value={form.datum} onChange={e => set('datum', e.target.value)} />
@@ -104,6 +128,11 @@ export default function EditEventPage() {
             <div>
               <label className="label">Begin <span className="text-rkv-red">*</span></label>
               <input className="input" type="time" value={form.beginUur} onChange={e => set('beginUur', e.target.value)} />
+            </div>
+            <div>
+              <label className="label">Einddatum <span className="text-rkv-red">*</span></label>
+              <input className="input" type="date" value={form.eindDatum} min={form.datum || undefined}
+                onChange={e => set('eindDatum', e.target.value)} />
             </div>
             <div>
               <label className="label">Einde <span className="text-rkv-red">*</span></label>

@@ -39,6 +39,7 @@ const EventSchema = z.object({
   datum: z.string(),
   beginUur: z.string().regex(/^\d{2}:\d{2}$/),
   eindUur:  z.string().regex(/^\d{2}:\d{2}$/),
+  eindDatum: z.string().optional(),
   plaats:   z.string().min(2),
   afspreekplaats:   z.string().optional(),
   afspreekStraat:   z.string().optional(),
@@ -64,7 +65,9 @@ export async function POST(req: NextRequest) {
   const event = await prisma.event.create({
     data: {
       naam: d.naam, datum: new Date(d.datum),
-      beginUur: d.beginUur, eindUur: d.eindUur, plaats: d.plaats,
+      beginUur: d.beginUur, eindUur: d.eindUur,
+      eindDatum: d.eindDatum ? new Date(d.eindDatum) : null,
+      plaats: d.plaats,
       afspreekplaats: d.afspreekplaats || null,
       afspreekStraat: d.afspreekStraat || null,
       afspreekNummer: d.afspreekNummer || null,

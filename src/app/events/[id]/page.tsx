@@ -79,10 +79,11 @@ export default function EventDetailPage() {
     // Escape special characters for ICS text values
     const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n')
 
-    // Build DTSTART / DTEND from datum + time strings (floating local time)
-    const dateStr = event.datum.substring(0, 10).replace(/-/g, '')          // "20240615"
-    const dtStart = `${dateStr}T${event.beginUur.replace(':', '')}00`       // "20240615T090000"
-    const dtEnd   = `${dateStr}T${event.eindUur.replace(':', '')}00`        // "20240615T170000"
+    // Build DTSTART / DTEND — use eindDatum for end date so overnight events are correct
+    const startDateStr = event.datum.substring(0, 10).replace(/-/g, '')
+    const endDateStr   = (event.eindDatum || event.datum).substring(0, 10).replace(/-/g, '')
+    const dtStart = `${startDateStr}T${event.beginUur.replace(':', '')}00`
+    const dtEnd   = `${endDateStr}T${event.eindUur.replace(':', '')}00`
 
     // Build description with afspreekplaats + opmerkingen
     const descLines: string[] = []
@@ -99,10 +100,7 @@ export default function EventDetailPage() {
     if (event.opmerkingen) descLines.push(`\nOpmerkingen: ${event.opmerkingen}`)
 
     // Build location field
-    const location = [
-      event.plaats,
-      event.afspreekGemeente,
-    ].filter(Boolean).join(', ')
+    const location = [event.plaats, event.afspreekGemeente].filter(Boolean).join(', ')
 
     const ics = [
       'BEGIN:VCALENDAR',
@@ -117,6 +115,7 @@ export default function EventDetailPage() {
       `SUMMARY:${esc(event.naam)}`,
       `DESCRIPTION:${esc(descLines.join('\n'))}`,
       `LOCATION:${esc(location)}`,
+      'ORGANIZER;CN=Rode Kruis Vlaanderen:mailto:noreply@gezozu.rodekruis.be',
       'STATUS:CONFIRMED',
       'END:VEVENT',
       'END:VCALENDAR',
@@ -143,7 +142,9 @@ export default function EventDetailPage() {
     </div>
   )
 
-  const datum = new Date(event.datum)
+  const datum     = new Date(event.datum)
+  const eindDatum = event.eindDatum ? new Date(event.eindDatum) : datum
+  const isOvernight = eindDatum.toDateString() !== datum.toDateString()
   const myAttendance = event.attendees?.find((a: any) => a.volunteerId === me?.id)
   const intern = event.attendees?.filter((a: any) => !a.isExternal) ?? []
   const extern = event.attendees?.filter((a: any) => a.isExternal) ?? []
@@ -218,7 +219,10 @@ export default function EventDetailPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 mt-4">
-            <InfoRow icon="🕐" label="Tijdstip" value={`${event.beginUur} – ${event.eindUur}`} />
+            <InfoRow icon="🕐" label="Tijdstip"
+              value={isOvernight
+                ? `${event.beginUur} – ${eindDatum.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })} ${event.eindUur}`
+                : `${event.beginUur} – ${event.eindUur}`} />
             <InfoRow icon="📍" label="Locatie" value={event.plaats} />
             <InfoRow icon="👥" label="Min. hulpverleners"
               value={`${event.aantalJa} / ${event.minHulpverleners}`}

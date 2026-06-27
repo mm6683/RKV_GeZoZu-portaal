@@ -10,7 +10,7 @@ export default function CreateEventPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState<string | null>(null)
   const [form, setForm] = useState({
-    naam: '', datum: '', beginUur: '', eindUur: '', plaats: '',
+    naam: '', datum: '', beginUur: '', eindUur: '', eindDatum: '', plaats: '',
     afspreekplaats: '', afspreekStraat: '', afspreekNummer: '',
     afspreekPostcode: '', afspreekGemeente: '',
     minHulpverleners: '2', minRank: '', opmerkingen: '',
@@ -23,7 +23,27 @@ export default function CreateEventPage() {
     })
   }, [])
 
-  function set(field: string, value: string) { setForm(f => ({ ...f, [field]: value })) }
+  function set(field: string, value: string) {
+    setForm(f => {
+      const updated = { ...f, [field]: value }
+
+      // Sync end date when start date changes (if they were on the same day)
+      if (field === 'datum') {
+        if (!f.eindDatum || f.eindDatum === f.datum) updated.eindDatum = value
+      }
+
+      // Auto-advance end date to next day when end time is before start time on the same day
+      if ((field === 'eindUur' || field === 'beginUur') && updated.datum && updated.eindDatum === updated.datum) {
+        if (updated.beginUur && updated.eindUur && updated.eindUur < updated.beginUur) {
+          const d = new Date(updated.datum + 'T12:00:00')
+          d.setDate(d.getDate() + 1)
+          updated.eindDatum = d.toISOString().split('T')[0]
+        }
+      }
+
+      return updated
+    })
+  }
 
   // Bouw Google Maps embed URL vanuit adresvelden
   function mapsEmbedUrl() {
@@ -48,6 +68,7 @@ export default function CreateEventPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         naam: form.naam, datum: form.datum, beginUur: form.beginUur, eindUur: form.eindUur,
+        eindDatum: form.eindDatum || form.datum,
         plaats: form.plaats, afspreekplaats: form.afspreekplaats || undefined,
         afspreekStraat: form.afspreekStraat || undefined, afspreekNummer: form.afspreekNummer || undefined,
         afspreekPostcode: form.afspreekPostcode || undefined, afspreekGemeente: form.afspreekGemeente || undefined,
@@ -83,7 +104,7 @@ export default function CreateEventPage() {
             <label className="label">Naam <span className="text-rkv-red">*</span></label>
             <input className="input" placeholder="bv. EHBO Limburghal" value={form.naam} onChange={e => set('naam', e.target.value)} />
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-3">
             <div>
               <label className="label">Datum <span className="text-rkv-red">*</span></label>
               <input className="input" type="date" value={form.datum} onChange={e => set('datum', e.target.value)} />
@@ -91,6 +112,11 @@ export default function CreateEventPage() {
             <div>
               <label className="label">Begin <span className="text-rkv-red">*</span></label>
               <input className="input" type="time" value={form.beginUur} onChange={e => set('beginUur', e.target.value)} />
+            </div>
+            <div>
+              <label className="label">Einddatum <span className="text-rkv-red">*</span></label>
+              <input className="input" type="date" value={form.eindDatum} min={form.datum || undefined}
+                onChange={e => set('eindDatum', e.target.value)} />
             </div>
             <div>
               <label className="label">Einde <span className="text-rkv-red">*</span></label>
