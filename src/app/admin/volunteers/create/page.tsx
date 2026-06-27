@@ -41,6 +41,9 @@ export default function CreateVolunteerPage() {
     if (!form.emailWerk.trim()) {
       setError('E-mailadres is verplicht — dit is het login-adres van de vrijwilliger.'); return
     }
+    if (!form.rkvId.trim()) {
+      setError('RKV ID is verplicht.'); return
+    }
 
     setSaving(true); setError(null)
 
@@ -102,7 +105,7 @@ export default function CreateVolunteerPage() {
               <input className="input" placeholder="+32 499 00 00 00" value={form.gsm} onChange={e => set('gsm', e.target.value)} />
             </div>
             <div>
-              <label className="label">RKV ID <span className="text-rkv-teal font-normal">(optioneel)</span></label>
+              <label className="label">RKV ID <span className="text-rkv-red">*</span></label>
               <input className="input font-mono" placeholder="bv. 08121600162" value={form.rkvId} onChange={e => set('rkvId', e.target.value)} />
             </div>
           </div>

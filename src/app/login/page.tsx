@@ -52,12 +52,9 @@ export default function LoginPage() {
           <div className="space-y-5">
             <div>
               <label className="label">Gebruikersnaam of RKV-ID</label>
-              <input type="text" className="input" placeholder="voornaam.achternaam"
+              <input type="text" className="input" placeholder="voornaam.achternaam of RKV-ID"
                 value={identifier} onChange={e => setIdentifier(e.target.value)}
                 onKeyDown={onKey} disabled={loading} autoComplete="username" autoFocus />
-              <p className="text-xs text-rkv-teal mt-1.5">
-                Gebruik <span className="font-mono font-medium">voornaam.achternaam</span> (bijv. <span className="font-mono font-medium">jan.peeters</span>) of je RKV-ID.
-              </p>
             </div>
             <div>
               <label className="label">Wachtwoord</label>
