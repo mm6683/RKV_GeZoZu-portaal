@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
+import { RANK_ORDER, getRankConfig } from '@/lib/ranks'
 
 export default function CreateEventPage() {
   const router = useRouter()
@@ -12,7 +13,7 @@ export default function CreateEventPage() {
     naam: '', datum: '', beginUur: '', eindUur: '', plaats: '',
     afspreekplaats: '', afspreekStraat: '', afspreekNummer: '',
     afspreekPostcode: '', afspreekGemeente: '',
-    minHulpverleners: '2', opmerkingen: '',
+    minHulpverleners: '2', minRank: '', opmerkingen: '',
   })
 
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function CreateEventPage() {
         afspreekStraat: form.afspreekStraat || undefined, afspreekNummer: form.afspreekNummer || undefined,
         afspreekPostcode: form.afspreekPostcode || undefined, afspreekGemeente: form.afspreekGemeente || undefined,
         minHulpverleners: parseInt(form.minHulpverleners),
+        minRank: form.minRank || null,
         opmerkingen: form.opmerkingen || undefined,
       }),
     })
@@ -104,6 +106,24 @@ export default function CreateEventPage() {
               <label className="label">Min. hulpverleners</label>
               <input className="input" type="number" min="1" max="50" value={form.minHulpverleners} onChange={e => set('minHulpverleners', e.target.value)} />
             </div>
+          </div>
+          <div>
+            <label className="label">Minimum rang</label>
+            <p className="text-xs text-rkv-teal mb-1.5">
+              Vrijwilligers onder deze rang worden niet op de lijst geplaatst en kunnen hun beschikbaarheid niet invullen.
+            </p>
+            <select
+              className="input"
+              value={form.minRank}
+              onChange={e => set('minRank', e.target.value)}
+            >
+              <option value="">(Geen beperking)</option>
+              {RANK_ORDER.map(rank => (
+                <option key={rank} value={rank}>
+                  {getRankConfig(rank).label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

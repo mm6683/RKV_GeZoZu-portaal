@@ -42,3 +42,25 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   return NextResponse.json(attendee, { status: 201 })
 }
+
+// DELETE — verwijder een externe vrijwilliger van een event (admin only)
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getSession()
+  if (!session.isAuthenticated) return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
+  if (!session.isAdmin) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
+
+  const { volunteerId } = await req.json()
+
+  // Enkel externe deelnemers mogen verwijderd worden
+  const attendee = await prisma.eventAttendee.findUnique({
+    where: { eventId_volunteerId: { eventId: params.id, volunteerId } },
+  })
+  if (!attendee) return NextResponse.json({ error: 'Deelnemer niet gevonden' }, { status: 404 })
+  if (!attendee.isExternal) return NextResponse.json({ error: 'Enkel externe vrijwilligers kunnen verwijderd worden' }, { status: 403 })
+
+  await prisma.eventAttendee.delete({
+    where: { eventId_volunteerId: { eventId: params.id, volunteerId } },
+  })
+
+  return NextResponse.json({ success: true })
+}

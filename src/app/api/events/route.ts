@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import prisma from '@/lib/db'
 import { z } from 'zod'
+import { RANK_ORDER } from '@/lib/ranks'
 
 // GET — opkomende events deze maand
 export async function GET() {
@@ -28,6 +29,11 @@ export async function GET() {
   })))
 }
 
+const VALID_RANKS = [
+  'BASISVRIJWILLIGER','EERSTEHULPVERLENER','EVENTHULPVERLENER','DGH',
+  'VERPLEEGKUNDIGE','DOKTER','ADJUNCT','AFDELINGSVERANTWOORDELIJKE',
+] as const
+
 const EventSchema = z.object({
   naam: z.string().min(2),
   datum: z.string(),
@@ -40,6 +46,7 @@ const EventSchema = z.object({
   afspreekPostcode: z.string().optional(),
   afspreekGemeente: z.string().optional(),
   minHulpverleners: z.number().int().min(1).default(2),
+  minRank: z.enum(VALID_RANKS).nullable().optional(),
   opmerkingen: z.string().optional(),
 })
 
@@ -64,19 +71,25 @@ export async function POST(req: NextRequest) {
       afspreekPostcode: d.afspreekPostcode || null,
       afspreekGemeente: d.afspreekGemeente || null,
       minHulpverleners: d.minHulpverleners,
+      minRank: d.minRank ?? null,
       opmerkingen: d.opmerkingen || null,
       createdById: session.volunteerId,
     },
   })
 
-  // Alle GeZoZu vrijwilligers als RESERVE toevoegen
+  // Alle GeZoZu vrijwilligers als RESERVE toevoegen, maar enkel boven de minimumrang
+  const minRankIndex = d.minRank ? RANK_ORDER.indexOf(d.minRank) : -1
   const gezozu = await prisma.volunteer.findMany({
     where: { isBlocked: false, hoofdentiteit: { contains: 'GENK-ZONHOVEN' } },
-    select: { id: true },
+    select: { id: true, rank: true },
   })
-  if (gezozu.length > 0) {
+  const eligible = minRankIndex >= 0
+    ? gezozu.filter(v => RANK_ORDER.indexOf(v.rank) >= minRankIndex)
+    : gezozu
+
+  if (eligible.length > 0) {
     await prisma.eventAttendee.createMany({
-      data: gezozu.map(v => ({ eventId: event.id, volunteerId: v.id, status: 'RESERVE' as const })),
+      data: eligible.map(v => ({ eventId: event.id, volunteerId: v.id, status: 'RESERVE' as const })),
       skipDuplicates: true,
     })
   }

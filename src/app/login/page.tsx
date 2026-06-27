@@ -4,20 +4,20 @@ import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [email, setEmail]       = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState<string | null>(null)
 
   async function handleLogin() {
-    if (!email.trim()) { setError('Vul je e-mailadres in.'); return }
+    if (!identifier.trim()) { setError('Vul je gebruikersnaam of RKV-ID in.'); return }
     setLoading(true); setError(null)
 
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password }),
+        body: JSON.stringify({ email: identifier.trim(), password }),
       })
       const data = await res.json()
 
@@ -51,10 +51,13 @@ export default function LoginPage() {
           <h2 className="text-rkv-teal-dark text-xl font-bold mb-6">Inloggen</h2>
           <div className="space-y-5">
             <div>
-              <label className="label">E-mailadres</label>
-              <input type="email" className="input" placeholder="naam@email.com"
-                value={email} onChange={e => setEmail(e.target.value)}
-                onKeyDown={onKey} disabled={loading} autoComplete="email" autoFocus />
+              <label className="label">Gebruikersnaam of RKV-ID</label>
+              <input type="text" className="input" placeholder="voornaam.achternaam"
+                value={identifier} onChange={e => setIdentifier(e.target.value)}
+                onKeyDown={onKey} disabled={loading} autoComplete="username" autoFocus />
+              <p className="text-xs text-rkv-teal mt-1.5">
+                Gebruik <span className="font-mono font-medium">voornaam.achternaam</span> (bijv. <span className="font-mono font-medium">jan.peeters</span>) of je RKV-ID.
+              </p>
             </div>
             <div>
               <label className="label">Wachtwoord</label>

@@ -107,9 +107,10 @@ model Event {
   afspreekPostcode String?
   afspreekGemeente String?
 
-  minHulpverleners Int      @default(2)
+  minHulpverleners Int            @default(2)
+  minRank          VolunteerRank?
   opmerkingen      String?
-  isActief         Boolean  @default(true)
+  isActief         Boolean        @default(true)
   isCancelled      Boolean  @default(false)
   createdById      String?
   attendees        EventAttendee[]

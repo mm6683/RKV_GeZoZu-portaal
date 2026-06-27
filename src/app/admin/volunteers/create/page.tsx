@@ -93,7 +93,9 @@ export default function CreateVolunteerPage() {
             <div className="col-span-2">
               <label className="label">E-mailadres <span className="text-rkv-red">*</span></label>
               <input className="input" type="email" placeholder="naam@email.com" value={form.emailWerk} onChange={e => set('emailWerk', e.target.value)} />
-              <p className="text-xs text-rkv-teal mt-1">Dit is het adres waarmee de vrijwilliger inlogt.</p>
+              <p className="text-xs text-rkv-teal mt-1">
+                De vrijwilliger logt in met <span className="font-mono font-medium">voornaam.achternaam</span> — het deel van het e-mailadres vóór @vrijwilliger.rodekruis.be.
+              </p>
             </div>
             <div>
               <label className="label">GSM</label>
@@ -159,7 +161,7 @@ export default function CreateVolunteerPage() {
         {/* Info box */}
         <div className="bg-rkv-gray rounded-xl p-4 text-sm text-rkv-teal">
           <p className="font-medium text-rkv-teal-dark mb-1">ℹ️ Na het aanmaken</p>
-          <p>De vrijwilliger heeft nog geen wachtwoord. Ze loggen in met hun RKV ID en worden automatisch naar het wachtwoord-instellen scherm gestuurd.</p>
+          <p>De vrijwilliger heeft nog geen wachtwoord. Ze loggen in met <strong>voornaam.achternaam</strong> (bijv. <span className="font-mono">jan.peeters</span> voor jan.peeters@vrijwilliger.rodekruis.be) of hun RKV-ID, en worden automatisch naar het wachtwoord-instellen scherm gestuurd.</p>
         </div>
 
         {error && (
