@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
 import StatusBadge from '@/components/StatusBadge'
+import { RANK_ORDER, getRankConfig } from '@/lib/ranks'
 import type { AttendStatus } from '@/types'
 
 export default function EventDetailPage() {
@@ -64,6 +65,72 @@ export default function EventDetailPage() {
     router.push('/dashboard')
   }
 
+  async function removeExternal(volunteerId: string) {
+    if (!confirm('Ben je zeker dat je deze externe vrijwilliger van het event wil verwijderen?')) return
+    await fetch(`/api/events/${id}/attendees`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ volunteerId }),
+    })
+    await loadData()
+  }
+
+  function downloadICS() {
+    // Escape special characters for ICS text values
+    const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n')
+
+    // Build DTSTART / DTEND from datum + time strings (floating local time)
+    const dateStr = event.datum.substring(0, 10).replace(/-/g, '')          // "20240615"
+    const dtStart = `${dateStr}T${event.beginUur.replace(':', '')}00`       // "20240615T090000"
+    const dtEnd   = `${dateStr}T${event.eindUur.replace(':', '')}00`        // "20240615T170000"
+
+    // Build description with afspreekplaats + opmerkingen
+    const descLines: string[] = []
+    if (event.afspreekplaats) descLines.push(`Afspreekplaats: ${event.afspreekplaats}`)
+    if (event.afspreekStraat || event.afspreekGemeente) {
+      const adres = [
+        event.afspreekStraat && event.afspreekNummer
+          ? `${event.afspreekStraat} ${event.afspreekNummer}`
+          : event.afspreekStraat,
+        [event.afspreekPostcode, event.afspreekGemeente].filter(Boolean).join(' '),
+      ].filter(Boolean).join(', ')
+      if (adres) descLines.push(`Adres: ${adres}`)
+    }
+    if (event.opmerkingen) descLines.push(`\nOpmerkingen: ${event.opmerkingen}`)
+
+    // Build location field
+    const location = [
+      event.plaats,
+      event.afspreekGemeente,
+    ].filter(Boolean).join(', ')
+
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//RKV GeZoZu//GeZoZu Portaal//NL',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `UID:${event.id}@gezozu.rodekruis.be`,
+      `DTSTART:${dtStart}`,
+      `DTEND:${dtEnd}`,
+      `SUMMARY:${esc(event.naam)}`,
+      `DESCRIPTION:${esc(descLines.join('\n'))}`,
+      `LOCATION:${esc(location)}`,
+      'STATUS:CONFIRMED',
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n')
+
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = `${event.naam.replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '_')}.ics`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-10 h-10 border-4 border-rkv-red/20 border-t-rkv-red rounded-full animate-spin" />
@@ -97,6 +164,11 @@ export default function EventDetailPage() {
   const mapsUrl = adresParts && adresParts !== 'België'
     ? `https://maps.google.com/maps?q=${encodeURIComponent(adresParts)}&output=embed`
     : null
+
+  // Minimum rang controle
+  const myRankIndex  = RANK_ORDER.indexOf(me?.rank)
+  const minRankIndex = event.minRank ? RANK_ORDER.indexOf(event.minRank) : -1
+  const isBelowMinRank = !me?.isAdmin && !myAttendance && minRankIndex >= 0 && myRankIndex < minRankIndex
 
   // Status knoppen: JA | ONBESCHIKBAAR | RESERVE (reserve rechts)
   const STATUS_BTNS: { status: AttendStatus; label: string; activeColor: string }[] = [
@@ -151,6 +223,11 @@ export default function EventDetailPage() {
             <InfoRow icon="👥" label="Min. hulpverleners"
               value={`${event.aantalJa} / ${event.minHulpverleners}`}
               color={event.aantalJa >= event.minHulpverleners ? '#8CAA2E' : '#EC2127'} />
+            {event.minRank && (
+              <InfoRow icon="🎖️" label="Minimum rang"
+                value={getRankConfig(event.minRank).label}
+                color={getRankConfig(event.minRank).color} />
+            )}
             {event.afspreekplaats && (
               <InfoRow icon="🚐" label="Afspreekplaats" value={event.afspreekplaats} />
             )}
@@ -182,6 +259,16 @@ export default function EventDetailPage() {
               <p className="text-sm text-rkv-teal-dark">{event.opmerkingen}</p>
             </div>
           )}
+
+          {/* Opslaan in agenda */}
+          <div className="mt-4 pt-4 border-t border-rkv-gray flex justify-end">
+            <button
+              onClick={downloadICS}
+              className="flex items-center gap-2 text-sm font-medium text-rkv-teal hover:text-rkv-red transition-colors"
+            >
+              <span className="text-base">📅</span> Opslaan in agenda
+            </button>
+          </div>
         </div>
 
         {/* ── Mijn beschikbaarheid ─────────────────────────────── */}
@@ -203,6 +290,27 @@ export default function EventDetailPage() {
                   </button>
                 )
               })}
+            </div>
+          </div>
+        )}
+
+        {/* ── Melding: rang te laag ────────────────────────────── */}
+        {isBelowMinRank && !event.isCancelled && (
+          <div className="card" style={{ backgroundColor: '#fffbeb', borderColor: '#f3a400', border: '1px solid' }}>
+            <div className="flex items-start gap-3">
+              <span className="text-xl flex-shrink-0">⚠️</span>
+              <div>
+                <p className="text-sm font-semibold" style={{ color: '#92400e' }}>
+                  Je rang voldoet niet aan de minimumvereiste
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: '#b45309' }}>
+                  Dit event vereist minimum rang{' '}
+                  <strong style={{ color: getRankConfig(event.minRank).color }}>
+                    {getRankConfig(event.minRank).label}
+                  </strong>
+                  . Je staat niet op de deelnemerslijst en kunt je beschikbaarheid niet invullen.
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -264,7 +372,8 @@ export default function EventDetailPage() {
                   <AttendeeRow key={a.volunteerId} attendee={a}
                     isMe={a.volunteerId === me?.id} isAdmin={me?.isAdmin}
                     loading={statusLoading === a.volunteerId} disabled={!!event.isCancelled}
-                    onStatusChange={s => setStatus(a.volunteerId, s)} />
+                    onStatusChange={s => setStatus(a.volunteerId, s)}
+                    onRemove={me?.isAdmin && !event.isCancelled ? () => removeExternal(a.volunteerId) : undefined} />
                 ))}
               </div>
             </>
@@ -284,9 +393,9 @@ function InfoRow({ icon, label, value, color }: { icon: string; label: string; v
   )
 }
 
-function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusChange }: {
+function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusChange, onRemove }: {
   attendee: any; isMe: boolean; isAdmin: boolean; loading: boolean
-  disabled: boolean; onStatusChange: (s: AttendStatus) => void
+  disabled: boolean; onStatusChange: (s: AttendStatus) => void; onRemove?: () => void
 }) {
   const STATUS_BTNS: { status: AttendStatus; label: string; activeColor: string }[] = [
     { status: 'JA',            label: '✓', activeColor: '#8CAA2E' },
@@ -313,7 +422,7 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
       </div>
 
       {canEdit ? (
-        <div className="flex gap-1">
+        <div className="flex gap-1 items-center">
           {STATUS_BTNS.map(({ status, label, activeColor }) => {
             const isActive = a.status === status
             return (
@@ -327,6 +436,18 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
               </button>
             )
           })}
+          {onRemove && (
+            <button
+              onClick={onRemove}
+              title="Externe vrijwilliger verwijderen"
+              className="w-7 h-7 rounded-lg text-xs font-bold transition-all ml-1"
+              style={{ backgroundColor: '#FEE2E2', color: '#EC2127' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#EC2127'; (e.currentTarget as HTMLButtonElement).style.color = '#fff' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FEE2E2'; (e.currentTarget as HTMLButtonElement).style.color = '#EC2127' }}
+            >
+              ✕
+            </button>
+          )}
         </div>
       ) : (
         <StatusBadge status={a.status} compact />
