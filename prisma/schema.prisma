@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum VolunteerRank {
+  BASISVRIJWILLIGER
+  NDPV
+  EERSTEHULPVERLENER
+  EVENTHULPVERLENER
+  SPOED
+  DGH
+  VERPLEEGKUNDIGE
+  DOKTER
+  ADJUNCT
+  AFDELINGSVERANTWOORDELIJKE
+}
+
+model Volunteer {
+  id            String        @id @default(cuid())
+  rkvId         String        @unique
+  voornaam      String
+  naam          String
+  volledigeNaam String
+  hoofdentiteit String
+  emailWerk     String?
+  emailPrive    String?
+  gsm           String?
+  pfpUrl        String?
+  displayName   String?
+  personId      String?
+
+  ranks         VolunteerRank[] @default([BASISVRIJWILLIGER])
+
+  isAdmin       Boolean       @default(false)
+  isExternal    Boolean       @default(false)
+  isBlocked     Boolean       @default(false)
+
+  passwordHash  String?
+  passwordSetAt DateTime?
+
+  lastSync      DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  qualifications  Qualification[]
+  functions       RkvFunction[]
+  attendances     EventAttendee[]
+  addedExternals  Volunteer[]   @relation("AddedBy")
+  addedBy         Volunteer?    @relation("AddedBy", fields: [addedById], references: [id])
+  addedById       String?
+
+  @@index([rkvId])
+  @@index([emailWerk])
+  @@index([hoofdentiteit])
+}
+
+enum QualificationType {
+  ERETEKEN
+  MEDISCH_DIPLOMA
+  KWALIFICATIE
+  BREVET
+  ATTEST
+}
+
+model Qualification {
+  id          String            @id @default(cuid())
+  volunteerId String
+  volunteer   Volunteer         @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  type        QualificationType
+  naam        String
+  geldigTot   String?
+  manualLock  Boolean           @default(false)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([volunteerId, type])
+}
+
+model RkvFunction {
+  id          String    @id @default(cuid())
+  volunteerId String
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  functie     String
+  entiteit    String?
+  status      String?
+  startdatum  String?
+  einddatum   String?
+  email       String?
+  manualLock  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
+
+model Event {
+  id               String   @id @default(cuid())
+  naam             String
+  datum            DateTime
+  beginUur         String
+  eindUur          String
+  eindDatum        DateTime?
+  plaats           String
+
+  afspreekplaats   String?
+  afspreekStraat   String?
+  afspreekNummer   String?
+  afspreekPostcode String?
+  afspreekGemeente String?
+
+  minHulpverleners Int            @default(2)
+  minRank          VolunteerRank?
+  opmerkingen      String?
+  isActief         Boolean        @default(true)
+  isCancelled      Boolean  @default(false)
+  createdById      String?
+  attendees        EventAttendee[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([datum])
+}
+
+enum AttendanceStatus {
+  RESERVE
+  JA
+  ONBESCHIKBAAR
+}
+
+model EventAttendee {
+  id          String           @id @default(cuid())
+  eventId     String
+  event       Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  volunteerId String
+  volunteer   Volunteer        @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  status      AttendanceStatus @default(RESERVE)
+  isExternal  Boolean          @default(false)
+  updatedById String?
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([eventId, volunteerId])
+  @@index([eventId])
+}
