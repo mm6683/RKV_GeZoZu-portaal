@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar'
 import EventCard from '@/components/EventCard'
 import RankBadge from '@/components/RankBadge'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
+import Collapsible from '@/components/Collapsible'
 
 type View = 'list' | 'calendar'
 
@@ -36,6 +37,7 @@ export default function Dashboard() {
   )
 
   const monthName = new Date().toLocaleDateString('nl-BE', { month: 'long' })
+  const { thisMonth, otherGroups, curYear } = groupEventsByMonth(events)
 
   return (
     <div className="min-h-screen bg-rkv-gray">
@@ -52,7 +54,7 @@ export default function Dashboard() {
               <h1 className="text-xl font-bold text-rkv-teal-dark truncate">{me.volledigeNaam}</h1>
               <p className="text-sm text-rkv-teal mt-0.5">{me.hoofdentiteit}</p>
               <div className="mt-2">
-                <RankBadge rank={me.rank} size="md" />
+                <RankBadge ranks={me.ranks} size="md" />
               </div>
             </div>
           </div>
@@ -62,7 +64,7 @@ export default function Dashboard() {
               <div className="text-xs text-rkv-teal mt-1">shifts dit jaar</div>
             </div>
             <div className="bg-rkv-gray rounded-xl p-4 text-center">
-              <div className="text-3xl font-bold text-rkv-teal-dark">{events.length}</div>
+              <div className="text-3xl font-bold text-rkv-teal-dark">{thisMonth.length}</div>
               <div className="text-xs text-rkv-teal mt-1">events deze maand</div>
             </div>
           </div>
@@ -72,7 +74,7 @@ export default function Dashboard() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="section-title mb-0 capitalize">Opkomende evenementen voor {monthName}</h2>
+              <h2 className="section-title mb-0">Opkomende evenementen</h2>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex bg-white rounded-xl border border-rkv-gray-mid overflow-hidden">
@@ -94,14 +96,41 @@ export default function Dashboard() {
           </div>
 
           {view === 'list' ? (
-            events.length === 0 ? (
-              <div className="card text-center text-rkv-teal py-10">
-                <p className="text-4xl mb-3">📅</p>
-                <p className="font-medium capitalize">Geen events gepland voor {monthName}.</p>
-              </div>
-            ) : (
-              events.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)
-            )
+            <div className="space-y-3">
+              <Collapsible title={`Deze maand (${monthName})`} count={thisMonth.length} defaultOpen>
+                {thisMonth.length === 0 ? (
+                  <p className="text-sm text-rkv-teal text-center py-6 capitalize">Geen events gepland voor {monthName}.</p>
+                ) : (
+                  thisMonth.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)
+                )}
+              </Collapsible>
+
+              {otherGroups.length > 0 && (
+                <Collapsible title="Opkomende maanden" count={otherGroups.reduce((n, g) => n + g.events.length, 0)}>
+                  {(() => {
+                    let lastYearShown: number | null = null
+                    return otherGroups.map(g => {
+                      const showYearHeader = g.year !== curYear && lastYearShown !== g.year
+                      if (showYearHeader) lastYearShown = g.year
+                      const monthLabel = new Date(g.year, g.month, 1).toLocaleDateString('nl-BE', { month: 'long' })
+                      return (
+                        <div key={`${g.year}-${g.month}`}>
+                          {showYearHeader && (
+                            <div className="text-sm font-bold text-rkv-teal-dark mt-4 mb-2 first:mt-0">{g.year}</div>
+                          )}
+                          <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
+                            {monthLabel}:
+                          </div>
+                          <div className="space-y-2">
+                            {g.events.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)}
+                          </div>
+                        </div>
+                      )
+                    })
+                  })()}
+                </Collapsible>
+              )}
+            </div>
           ) : (
             <CalendarView events={events} month={calMonth}
               onMonthChange={setCalMonth}
@@ -118,6 +147,32 @@ export default function Dashboard() {
       </div>
     </div>
   )
+}
+
+// Groepeert events in "deze maand" + alle andere (toekomstige) maanden,
+// gesorteerd chronologisch. Andere jaren dan het huidige jaar krijgen een
+// jaar-header (bv. "2027"), de rest toont enkel de maandnaam.
+function groupEventsByMonth(events: any[]) {
+  const now = new Date()
+  const curYear = now.getFullYear(), curMonth = now.getMonth()
+
+  const thisMonth: any[] = []
+  const otherMap = new Map<string, { year: number; month: number; events: any[] }>()
+
+  for (const e of events) {
+    const d = new Date(e.datum)
+    const y = d.getFullYear(), m = d.getMonth()
+    if (y === curYear && m === curMonth) {
+      thisMonth.push(e)
+    } else {
+      const key = `${y}-${m}`
+      if (!otherMap.has(key)) otherMap.set(key, { year: y, month: m, events: [] })
+      otherMap.get(key)!.events.push(e)
+    }
+  }
+
+  const otherGroups = Array.from(otherMap.values()).sort((a, b) => a.year - b.year || a.month - b.month)
+  return { thisMonth, otherGroups, curYear }
 }
 
 function CalendarView({ events, month, onMonthChange, onEventClick }: {
