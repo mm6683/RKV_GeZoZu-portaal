@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   if (!session.isAdmin) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
 
   const body = await req.json()
-  const { voornaam, naam, emailWerk, gsm, hoofdentiteit, rank, isExternal, rkvId } = body
+  const { voornaam, naam, emailWerk, gsm, hoofdentiteit, ranks, isExternal, rkvId } = body
 
   if (!voornaam?.trim() || !naam?.trim()) {
     return NextResponse.json({ error: 'Voor- en achternaam zijn verplicht.' }, { status: 400 })
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       emailWerk:     emailWerk.trim().toLowerCase(),
       gsm:           gsm?.trim() || null,
       hoofdentiteit: hoofdentiteit?.trim() || 'GENK-ZONHOVEN-ZUTENDAAL',
-      rank:          rank || 'BASISVRIJWILLIGER',
+      ranks:         Array.isArray(ranks) && ranks.length > 0 ? ranks : ['BASISVRIJWILLIGER'],
       isExternal:    isExternal === true,   // expliciet boolean check
       addedById:     session.volunteerId,
     },

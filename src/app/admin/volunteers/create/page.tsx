@@ -16,7 +16,7 @@ export default function CreateVolunteerPage() {
     emailWerk:     '',
     gsm:           '',
     hoofdentiteit: 'GENK-ZONHOVEN-ZUTENDAAL',
-    rank:          'BASISVRIJWILLIGER',
+    ranks:         ['BASISVRIJWILLIGER'] as string[],
     isExternal:    false,
   })
 
@@ -34,6 +34,13 @@ export default function CreateVolunteerPage() {
     setForm(f => ({ ...f, [field]: value }))
   }
 
+  function toggleRank(rank: string) {
+    setForm(f => ({
+      ...f,
+      ranks: f.ranks.includes(rank) ? f.ranks.filter(r => r !== rank) : [...f.ranks, rank],
+    }))
+  }
+
   async function handleSubmit() {
     if (!form.voornaam.trim() || !form.naam.trim()) {
       setError('Voor- en achternaam zijn verplicht.'); return
@@ -43,6 +50,9 @@ export default function CreateVolunteerPage() {
     }
     if (!form.rkvId.trim()) {
       setError('RKV ID is verplicht.'); return
+    }
+    if (form.ranks.length === 0) {
+      setError('Selecteer minstens 1 SB.'); return
     }
 
     setSaving(true); setError(null)
@@ -116,17 +126,19 @@ export default function CreateVolunteerPage() {
           </div>
         </div>
 
-        {/* Rang */}
+        {/* SB */}
         <div className="card space-y-3">
-          <h2 className="section-title">Rang</h2>
+          <h2 className="section-title mb-0">SB</h2>
+          <p className="text-xs text-rkv-teal -mt-2">Selecteer één of meerdere Sanitaire Bekwaamheden.</p>
           <div className="grid grid-cols-2 gap-2">
             {RANK_ORDER.map(rank => {
               const cfg = VOLUNTEER_RANKS[rank]
-              const isSelected = form.rank === rank
+              const isSelected = form.ranks.includes(rank)
               return (
                 <button
                   key={rank}
-                  onClick={() => set('rank', rank)}
+                  type="button"
+                  onClick={() => toggleRank(rank)}
                   className={`flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all ${
                     isSelected ? 'border-rkv-red bg-rkv-red/5' : 'border-rkv-gray-mid hover:border-rkv-teal'
                   }`}

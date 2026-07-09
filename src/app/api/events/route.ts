@@ -2,20 +2,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import prisma from '@/lib/db'
 import { z } from 'zod'
-import { RANK_ORDER } from '@/lib/ranks'
+import { enrollEligibleVolunteers } from '@/lib/eventHelpers'
 
-// GET — opkomende events deze maand
+// GET — alle opkomende events (deze maand + alle volgende maanden/jaren).
+// De frontend groepeert dit zelf per maand ("deze maand" + dropdown andere
+// maanden) en de kalender heeft hierdoor ook toegang tot volgende maanden.
 export async function GET() {
   const session = await getSession()
   if (!session.isAuthenticated) return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
 
   const now = new Date()
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const endOfMonth   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
 
   const events = await prisma.event.findMany({
-    where: { isActief: true, isCancelled: false, datum: { gte: startOfToday, lte: endOfMonth } },
-    orderBy: { datum: 'asc' },
+    where: { isActief: true, isCancelled: false, datum: { gte: startOfToday } },
+    // Binnen eenzelfde dag sorteren op startuur i.p.v. (impliciet) alfabetisch
+    orderBy: [{ datum: 'asc' }, { beginUur: 'asc' }],
     include: { attendees: { select: { status: true } } },
   })
 
@@ -30,7 +32,7 @@ export async function GET() {
 }
 
 const VALID_RANKS = [
-  'BASISVRIJWILLIGER','EERSTEHULPVERLENER','EVENTHULPVERLENER','DGH',
+  'BASISVRIJWILLIGER','NDPV','EERSTEHULPVERLENER','EVENTHULPVERLENER','SPOED','DGH',
   'VERPLEEGKUNDIGE','DOKTER','ADJUNCT','AFDELINGSVERANTWOORDELIJKE',
 ] as const
 
@@ -80,22 +82,8 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  // Alle GeZoZu vrijwilligers als RESERVE toevoegen, maar enkel boven de minimumrang
-  const minRankIndex = d.minRank ? RANK_ORDER.indexOf(d.minRank) : -1
-  const gezozu = await prisma.volunteer.findMany({
-    where: { isBlocked: false, hoofdentiteit: { contains: 'GENK-ZONHOVEN' } },
-    select: { id: true, rank: true },
-  })
-  const eligible = minRankIndex >= 0
-    ? gezozu.filter(v => RANK_ORDER.indexOf(v.rank) >= minRankIndex)
-    : gezozu
-
-  if (eligible.length > 0) {
-    await prisma.eventAttendee.createMany({
-      data: eligible.map(v => ({ eventId: event.id, volunteerId: v.id, status: 'RESERVE' as const })),
-      skipDuplicates: true,
-    })
-  }
+  // Alle GeZoZu vrijwilligers als RESERVE toevoegen, maar enkel boven de minimum-SB
+  await enrollEligibleVolunteers(event.id, d.minRank ?? null)
 
   return NextResponse.json(event, { status: 201 })
 }

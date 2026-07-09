@@ -115,10 +115,10 @@ export default function AdminPage() {
                     <span className="text-xs text-rkv-teal">{v.rkvId}</span>
                     <span className="text-rkv-teal-dark/30">·</span>
                     <span className="text-xs text-rkv-teal">{v.hoofdentiteit}</span>
-                    {v.rank && (
+                    {v.ranks?.length > 0 && (
                       <>
                         <span className="text-rkv-teal-dark/30">·</span>
-                        <RankBadge rank={v.rank} size="sm" />
+                        <RankBadge ranks={v.ranks} size="sm" />
                       </>
                     )}
                   </div>

@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
 import StatusBadge from '@/components/StatusBadge'
-import { RANK_ORDER, getRankConfig } from '@/lib/ranks'
+import { RANK_ORDER, getRankConfig, getHighestRankIndex } from '@/lib/ranks'
 import type { AttendStatus } from '@/types'
 
 export default function EventDetailPage() {
@@ -19,6 +19,11 @@ export default function EventDetailPage() {
   const [showExternDropdown, setShowExternDropdown] = useState(false)
   const [externSearch, setExternSearch] = useState('')
   const [allVolunteers, setAllVolunteers] = useState<any[]>([])
+  const [showRepeat, setShowRepeat] = useState(false)
+  const [repeatDate, setRepeatDate] = useState('')
+  const [repeating, setRepeating] = useState(false)
+  const [repeatResult, setRepeatResult] = useState<any>(null)
+  const [repeatError, setRepeatError] = useState<string | null>(null)
 
   useEffect(() => { loadData() }, [])
 
@@ -56,6 +61,24 @@ export default function EventDetailPage() {
     setShowExternDropdown(false)
     setExternSearch('')
     await loadData()
+  }
+
+  async function handleRepeat() {
+    if (!repeatDate) return
+    setRepeating(true); setRepeatError(null); setRepeatResult(null)
+    const res = await fetch(`/api/events/${id}/repeat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ datum: repeatDate }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      setRepeatResult(data)
+      setRepeatDate('')
+    } else {
+      setRepeatError(data.error || 'Herhalen mislukt.')
+    }
+    setRepeating(false)
   }
 
   async function handleCancel() {
@@ -166,8 +189,8 @@ export default function EventDetailPage() {
     ? `https://maps.google.com/maps?q=${encodeURIComponent(adresParts)}&output=embed`
     : null
 
-  // Minimum rang controle
-  const myRankIndex  = RANK_ORDER.indexOf(me?.rank)
+  // Minimum SB controle — hoogste van je SB's telt mee
+  const myRankIndex  = getHighestRankIndex(me?.ranks)
   const minRankIndex = event.minRank ? RANK_ORDER.indexOf(event.minRank) : -1
   const isBelowMinRank = !me?.isAdmin && !myAttendance && minRankIndex >= 0 && myRankIndex < minRankIndex
 
@@ -207,6 +230,9 @@ export default function EventDetailPage() {
                 <button onClick={() => router.push(`/admin/events/${id}/edit`)} className="btn-outline text-sm">
                   ✏️ Bewerken
                 </button>
+                <button onClick={() => setShowRepeat(s => !s)} className="text-sm border-2 border-cta-blue text-cta-blue px-3 py-1.5 rounded-xl hover:bg-cta-blue hover:text-white transition-colors">
+                  🔁 Herhalen
+                </button>
                 <button
                   onClick={handleCancel}
                   disabled={cancelling}
@@ -218,6 +244,36 @@ export default function EventDetailPage() {
             )}
           </div>
 
+          {/* Event herhalen naar andere datum */}
+          {showRepeat && !event.isCancelled && (
+            <div className="mt-4 bg-rkv-gray rounded-xl p-4 space-y-3">
+              <p className="text-xs text-rkv-teal">
+                Maakt een kopie van dit event op een nieuwe datum, met dezelfde tijden, locatie en instellingen.
+              </p>
+              <div className="flex gap-3 items-end flex-wrap">
+                <div className="flex-1 min-w-[160px]">
+                  <label className="label">Nieuwe datum</label>
+                  <input type="date" className="input" value={repeatDate}
+                    onChange={e => setRepeatDate(e.target.value)} />
+                </div>
+                <button onClick={handleRepeat} disabled={repeating || !repeatDate} className="btn-blue text-sm py-3">
+                  {repeating ? 'Bezig…' : 'Dupliceren'}
+                </button>
+              </div>
+              {repeatError && <p className="text-sm text-rkv-red">⚠️ {repeatError}</p>}
+              {repeatResult && (
+                <div className="bg-rank-green/10 border border-rank-green/30 rounded-xl px-4 py-3 text-sm flex items-center justify-between gap-3">
+                  <span className="text-rkv-teal-dark">
+                    ✓ Event gedupliceerd naar {new Date(repeatResult.datum).toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </span>
+                  <button onClick={() => router.push(`/events/${repeatResult.id}`)} className="text-cta-blue font-medium hover:underline whitespace-nowrap">
+                    Bekijken →
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4 mt-4">
             <InfoRow icon="🕐" label="Tijdstip"
               value={isOvernight
@@ -228,7 +284,7 @@ export default function EventDetailPage() {
               value={`${event.aantalJa} / ${event.minHulpverleners}`}
               color={event.aantalJa >= event.minHulpverleners ? '#8CAA2E' : '#EC2127'} />
             {event.minRank && (
-              <InfoRow icon="🎖️" label="Minimum rang"
+              <InfoRow icon="🎖️" label="Minimum SB"
                 value={getRankConfig(event.minRank).label}
                 color={getRankConfig(event.minRank).color} />
             )}
@@ -298,17 +354,17 @@ export default function EventDetailPage() {
           </div>
         )}
 
-        {/* ── Melding: rang te laag ────────────────────────────── */}
+        {/* ── Melding: SB te laag ──────────────────────────────── */}
         {isBelowMinRank && !event.isCancelled && (
           <div className="card" style={{ backgroundColor: '#fffbeb', borderColor: '#f3a400', border: '1px solid' }}>
             <div className="flex items-start gap-3">
               <span className="text-xl flex-shrink-0">⚠️</span>
               <div>
                 <p className="text-sm font-semibold" style={{ color: '#92400e' }}>
-                  Je rang voldoet niet aan de minimumvereiste
+                  Je SB voldoet niet aan de minimumvereiste
                 </p>
                 <p className="text-xs mt-0.5" style={{ color: '#b45309' }}>
-                  Dit event vereist minimum rang{' '}
+                  Dit event vereist minimum SB{' '}
                   <strong style={{ color: getRankConfig(event.minRank).color }}>
                     {getRankConfig(event.minRank).label}
                   </strong>
@@ -420,7 +476,7 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
           {isMe && <span className="text-xs text-rkv-red font-medium">(jij)</span>}
         </div>
         <div className="flex items-center gap-2 mt-0.5">
-          <RankBadge rank={a.rank} size="sm" />
+          <RankBadge ranks={a.ranks} size="sm" />
           <span className="text-xs text-rkv-teal">{a.hoofdentiteit}</span>
         </div>
       </div>

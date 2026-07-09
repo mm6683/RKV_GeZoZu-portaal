@@ -17,7 +17,7 @@ export async function GET() {
         { isCancelled: true },           // geannuleerd
       ],
     },
-    orderBy: { datum: 'desc' },
+    orderBy: [{ datum: 'desc' }, { beginUur: 'asc' }],
     include: { attendees: { select: { status: true } } },
   })
 

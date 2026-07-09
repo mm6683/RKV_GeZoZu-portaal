@@ -9,8 +9,10 @@ datasource db {
 
 enum VolunteerRank {
   BASISVRIJWILLIGER
+  NDPV
   EERSTEHULPVERLENER
   EVENTHULPVERLENER
+  SPOED
   DGH
   VERPLEEGKUNDIGE
   DOKTER
@@ -32,7 +34,7 @@ model Volunteer {
   displayName   String?
   personId      String?
 
-  rank          VolunteerRank @default(BASISVRIJWILLIGER)
+  ranks         VolunteerRank[] @default([BASISVRIJWILLIGER])
 
   isAdmin       Boolean       @default(false)
   isExternal    Boolean       @default(false)

@@ -109,9 +109,9 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              {/* Rang badge */}
+              {/* SB badge */}
               <div className="mt-3 flex items-center gap-2 flex-wrap">
-                <RankBadge rank={profile.rank} size="lg" />
+                <RankBadge ranks={profile.ranks} size="lg" />
                 {profile.isAdmin && (
                   <span className="badge bg-cta-blue text-white text-xs px-2.5 py-1">Admin</span>
                 )}

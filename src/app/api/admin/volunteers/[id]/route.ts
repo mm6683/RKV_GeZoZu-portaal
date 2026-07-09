@@ -60,7 +60,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       hoofdentiteit: body.hoofdentiteit,
       emailWerk:     body.emailWerk || null,
       gsm:           body.gsm || null,
-      rank:          body.rank,
+      ranks:         Array.isArray(body.ranks) && body.ranks.length > 0 ? body.ranks : ['BASISVRIJWILLIGER'],
       isAdmin:       body.isAdmin,
       isExternal:    body.isExternal, // Toegevoegd zodat externe status opslaat
       isBlocked:     body.isBlocked,

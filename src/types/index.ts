@@ -12,7 +12,7 @@ export interface VolunteerPublic {
   pfpUrl: string | null
   isAdmin: boolean
   isExternal: boolean
-  rank: string
+  ranks: string[]
   qualifications: { type: QualType; naam: string; geldigTot?: string | null }[]
   functions: { functie: string; entiteit?: string | null; status?: string | null }[]
 }
@@ -43,7 +43,7 @@ export interface AttendeePublic {
   pfpUrl: string | null
   hoofdentiteit: string
   isExternal: boolean
-  rank: string
+  ranks: string[]
   highestQual: { naam: string; type: QualType; color: string } | null
   status: AttendStatus
 }

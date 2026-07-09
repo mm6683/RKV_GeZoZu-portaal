@@ -134,9 +134,9 @@ export default function CreateEventPage() {
             </div>
           </div>
           <div>
-            <label className="label">Minimum rang</label>
+            <label className="label">Minimum SB</label>
             <p className="text-xs text-rkv-teal mb-1.5">
-              Vrijwilligers onder deze rang worden niet op de lijst geplaatst en kunnen hun beschikbaarheid niet invullen.
+              Vrijwilligers onder deze SB worden niet op de lijst geplaatst en kunnen hun beschikbaarheid niet invullen.
             </p>
             <select
               className="input"

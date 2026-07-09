@@ -41,14 +41,22 @@ export default function AdminVolunteerDetail() {
       hoofdentiteit: volData.hoofdentiteit,
       emailWerk:     volData.emailWerk || '',
       gsm:           volData.gsm || '',
-      rank:          volData.rank || 'BASISVRIJWILLIGER',
+      ranks:         volData.ranks?.length ? volData.ranks : ['BASISVRIJWILLIGER'],
       isAdmin:       volData.isAdmin,
       isExternal:    volData.isExternal,
     })
     setQuals(volData.qualifications || [])
   }
 
+  function toggleRank(rank: string) {
+    setForm((f: any) => ({
+      ...f,
+      ranks: f.ranks.includes(rank) ? f.ranks.filter((r: string) => r !== rank) : [...f.ranks, rank],
+    }))
+  }
+
   async function save() {
+    if (!form.ranks?.length) { alert('Selecteer minstens 1 SB.'); return }
     setSaving(true)
     await fetch(`/api/admin/volunteers/${id}`, {
       method: 'PUT',
@@ -119,7 +127,7 @@ export default function AdminVolunteerDetail() {
               <h1 className="text-xl font-bold text-rkv-teal-dark">{volunteer.volledigeNaam}</h1>
               <p className="text-sm text-rkv-teal">{volunteer.emailWerk || '—'}</p>
               <div className="flex items-center gap-2 mt-1.5">
-                <RankBadge rank={form.rank} size="sm" />
+                <RankBadge ranks={form.ranks} size="sm" />
                 {volunteer.isExternal && <span className="badge bg-rkv-teal text-white text-xs">Extern</span>}
                 {!hasPassword && <span className="badge bg-yellow-100 text-yellow-700 text-xs">Nog geen wachtwoord</span>}
               </div>
@@ -130,15 +138,16 @@ export default function AdminVolunteerDetail() {
           </div>
         </div>
 
-        {/* ── Rang ─────────────────────────────────────────────── */}
+        {/* ── SB ───────────────────────────────────────────────── */}
         <div className="card space-y-4">
-          <h2 className="section-title">Rang</h2>
+          <h2 className="section-title mb-0">SB</h2>
+          <p className="text-xs text-rkv-teal -mt-3">Selecteer één of meerdere Sanitaire Bekwaamheden.</p>
           <div className="grid grid-cols-2 gap-2">
             {RANK_ORDER.map(rank => {
               const cfg = VOLUNTEER_RANKS[rank]
-              const isSelected = form.rank === rank
+              const isSelected = form.ranks?.includes(rank)
               return (
-                <button key={rank} onClick={() => setF('rank', rank)}
+                <button key={rank} type="button" onClick={() => toggleRank(rank)}
                   className={`flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all ${
                     isSelected ? 'border-rkv-red bg-rkv-red/5' : 'border-rkv-gray-mid hover:border-rkv-teal'
                   }`}

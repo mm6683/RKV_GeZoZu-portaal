@@ -48,7 +48,7 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
       pfpUrl: a.volunteer.pfpUrl,
       hoofdentiteit: a.volunteer.hoofdentiteit,
       isExternal: a.isExternal,
-      rank: a.volunteer.rank,
+      ranks: a.volunteer.ranks,
       highestQual: getHighestQual(a.volunteer.qualifications),
       status: a.status,
     })),

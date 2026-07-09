@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import prisma from '@/lib/db'
 import { getHighestQual } from '@/lib/ranks'
+import { hasEventStarted } from '@/lib/eventHelpers'
 
 export async function GET(
   _: NextRequest,
@@ -24,7 +25,7 @@ export async function GET(
       functions: { where: { status: { not: 'Inactief' } }, orderBy: { startdatum: 'desc' } },
       attendances: {
         where: { status: 'JA' },
-        include: { event: { select: { id: true, naam: true, datum: true, plaats: true } } },
+        include: { event: { select: { id: true, naam: true, datum: true, plaats: true, beginUur: true } } },
         orderBy: { event: { datum: 'desc' } },
         take: 50,
       },
@@ -34,8 +35,11 @@ export async function GET(
   if (!volunteer) return NextResponse.json({ error: 'Niet gevonden' }, { status: 404 })
 
   const now = new Date()
+  // Enkel shifts die al bezig zijn of al voorbij zijn tellen mee, geen
+  // toekomstige events waar je je enkel op hebt aangemeld.
   const shiftenDitJaar = volunteer.attendances.filter(
     a => new Date(a.event.datum).getFullYear() === now.getFullYear()
+      && hasEventStarted(a.event.datum, a.event.beginUur, now)
   ).length
 
   return NextResponse.json({
@@ -49,7 +53,7 @@ export async function GET(
     pfpUrl: volunteer.pfpUrl,
     isAdmin: volunteer.isAdmin,
     isExternal: volunteer.isExternal,
-    rank: volunteer.rank,
+    ranks: volunteer.ranks,
     highestQual: getHighestQual(volunteer.qualifications),
     shiftenDitJaar,
     totalShiften: volunteer.attendances.length,
