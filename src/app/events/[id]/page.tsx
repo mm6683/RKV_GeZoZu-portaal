@@ -169,8 +169,17 @@ export default function EventDetailPage() {
   const eindDatum = event.eindDatum ? new Date(event.eindDatum) : datum
   const isOvernight = eindDatum.toDateString() !== datum.toDateString()
   const myAttendance = event.attendees?.find((a: any) => a.volunteerId === me?.id)
-  const intern = event.attendees?.filter((a: any) => !a.isExternal) ?? []
-  const extern = event.attendees?.filter((a: any) => a.isExternal) ?? []
+  const sortByMeThenAvailable = (a: any, b: any) => {
+    const aIsMe = a.volunteerId === me?.id
+    const bIsMe = b.volunteerId === me?.id
+    if (aIsMe !== bIsMe) return aIsMe ? -1 : 1
+    const aAvailable = a.status === 'JA'
+    const bAvailable = b.status === 'JA'
+    if (aAvailable !== bAvailable) return aAvailable ? -1 : 1
+    return 0
+  }
+  const intern = (event.attendees?.filter((a: any) => !a.isExternal) ?? []).slice().sort(sortByMeThenAvailable)
+  const extern = (event.attendees?.filter((a: any) => a.isExternal) ?? []).slice().sort(sortByMeThenAvailable)
   const filteredVolunteers = allVolunteers.filter(v =>
     !event.attendees?.find((a: any) => a.volunteerId === v.id) &&
     v.volledigeNaam.toLowerCase().includes(externSearch.toLowerCase())
