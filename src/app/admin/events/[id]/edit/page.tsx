@@ -120,23 +120,23 @@ export default function EditEventPage() {
             <label className="label">Naam <span className="text-rkv-red">*</span></label>
             <input className="input" value={form.naam} onChange={e => set('naam', e.target.value)} />
           </div>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div>
               <label className="label">Datum <span className="text-rkv-red">*</span></label>
-              <input className="input" type="date" value={form.datum} onChange={e => set('datum', e.target.value)} />
+              <input className="input min-w-0" type="date" value={form.datum} onChange={e => set('datum', e.target.value)} />
             </div>
             <div>
               <label className="label">Begin <span className="text-rkv-red">*</span></label>
-              <input className="input" type="time" value={form.beginUur} onChange={e => set('beginUur', e.target.value)} />
+              <input className="input min-w-0" type="time" value={form.beginUur} onChange={e => set('beginUur', e.target.value)} />
             </div>
             <div>
               <label className="label">Einddatum <span className="text-rkv-red">*</span></label>
-              <input className="input" type="date" value={form.eindDatum} min={form.datum || undefined}
+              <input className="input min-w-0" type="date" value={form.eindDatum} min={form.datum || undefined}
                 onChange={e => set('eindDatum', e.target.value)} />
             </div>
             <div>
               <label className="label">Einde <span className="text-rkv-red">*</span></label>
-              <input className="input" type="time" value={form.eindUur} onChange={e => set('eindUur', e.target.value)} />
+              <input className="input min-w-0" type="time" value={form.eindUur} onChange={e => set('eindUur', e.target.value)} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
