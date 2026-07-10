@@ -102,11 +102,41 @@ export default function EventDetailPage() {
     // Escape special characters for ICS text values
     const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n')
 
-    // Build DTSTART / DTEND — use eindDatum for end date so overnight events are correct
+    // Fold a "PROP:value" line to the RFC 5545 75-octet limit.
+    // Lines that aren't folded (and instead run on forever) are one of the
+    // main reasons Google Calendar's single-file "open .ics" launcher
+    // chokes with a generic error, even though the file still opens fine
+    // in more forgiving tools/desktop apps.
+    const fold = (line: string) => {
+      const CRLF_SP = '\r\n '
+      let out = ''
+      let bytes = 0
+      for (const ch of line) {
+        const chLen = new TextEncoder().encode(ch).length
+        if (bytes + chLen > 74) {
+          out += CRLF_SP
+          bytes = 0
+        }
+        out += ch
+        bytes += chLen
+      }
+      return out
+    }
+
+    // Build DTSTART / DTEND — use eindDatum for end date so overnight events are correct.
+    // These are wall-clock times, so they're tagged with TZID=Europe/Brussels (with the
+    // matching VTIMEZONE block below) rather than left "floating" — floating times get
+    // reinterpreted using whatever timezone the *viewing device* happens to be in.
     const startDateStr = event.datum.substring(0, 10).replace(/-/g, '')
     const endDateStr   = (event.eindDatum || event.datum).substring(0, 10).replace(/-/g, '')
     const dtStart = `${startDateStr}T${event.beginUur.replace(':', '')}00`
     const dtEnd   = `${endDateStr}T${event.eindUur.replace(':', '')}00`
+
+    // DTSTAMP is a REQUIRED property on every VEVENT (RFC 5545 §3.6.1) — it's not the
+    // event's start time, it's "when was this ICS generated". Google Calendar's launcher
+    // is strict about this and fails silently (well — with "Failed to launch event")
+    // when it's missing, which is exactly what was happening here.
+    const dtStamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
 
     // Build description with afspreekplaats + opmerkingen
     const descLines: string[] = []
@@ -116,7 +146,7 @@ export default function EventDetailPage() {
         event.afspreekStraat && event.afspreekNummer
           ? `${event.afspreekStraat} ${event.afspreekNummer}`
           : event.afspreekStraat,
-        [event.afspreekPostcode, event.afspreekGemeente].filter(Boolean).join(' '),
+        [event.afspreekPostcode, event.afspreekGemeente].filter(Boolean).join(', '),
       ].filter(Boolean).join(', ')
       if (adres) descLines.push(`Adres: ${adres}`)
     }
@@ -125,16 +155,37 @@ export default function EventDetailPage() {
     // Build location field
     const location = [event.plaats, event.afspreekGemeente].filter(Boolean).join(', ')
 
-    const ics = [
+    const lines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
       'PRODID:-//RKV GeZoZu//GeZoZu Portaal//NL',
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
+      // Standard EU DST rule (last Sunday of March / last Sunday of October),
+      // which also applies to Belgium — lets DTSTART/DTEND below use a TZID
+      // safely without depending on the viewing calendar already knowing it.
+      'BEGIN:VTIMEZONE',
+      'TZID:Europe/Brussels',
+      'BEGIN:DAYLIGHT',
+      'TZOFFSETFROM:+0100',
+      'TZOFFSETTO:+0200',
+      'TZNAME:CEST',
+      'DTSTART:19700329T020000',
+      'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU',
+      'END:DAYLIGHT',
+      'BEGIN:STANDARD',
+      'TZOFFSETFROM:+0200',
+      'TZOFFSETTO:+0100',
+      'TZNAME:CET',
+      'DTSTART:19701025T030000',
+      'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU',
+      'END:STANDARD',
+      'END:VTIMEZONE',
       'BEGIN:VEVENT',
       `UID:${event.id}@gezozu.rodekruis.be`,
-      `DTSTART:${dtStart}`,
-      `DTEND:${dtEnd}`,
+      `DTSTAMP:${dtStamp}`,
+      `DTSTART;TZID=Europe/Brussels:${dtStart}`,
+      `DTEND;TZID=Europe/Brussels:${dtEnd}`,
       `SUMMARY:${esc(event.naam)}`,
       `DESCRIPTION:${esc(descLines.join('\n'))}`,
       `LOCATION:${esc(location)}`,
@@ -142,7 +193,11 @@ export default function EventDetailPage() {
       'STATUS:CONFIRMED',
       'END:VEVENT',
       'END:VCALENDAR',
-    ].join('\r\n')
+    ]
+
+    // Fold every content line, then join with CRLF and end with a trailing
+    // CRLF — both are required by the spec and some parsers are strict about it.
+    const ics = lines.map(fold).join('\r\n') + '\r\n'
 
     const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' })
     const url  = URL.createObjectURL(blob)
