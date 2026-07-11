@@ -1,5 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
+import type { AttendStatus } from '@/types'
 
 interface Props {
   id: string
@@ -11,12 +12,22 @@ interface Props {
   minHulpverleners: number
   aantalJa: number
   isAdmin?: boolean
+  myStatus?: AttendStatus | null
+}
+
+// Enkel JA/ONBESCHIKBAAR zijn een bewuste keuze — RESERVE is de automatische
+// standaard voor iedereen (zie enrollEligibleVolunteers) en zou op elke
+// kaart verschijnen als we die ook zouden tonen, wat geen nuttige info geeft.
+const MY_STATUS_CONFIG: Partial<Record<AttendStatus, { label: string; bg: string }>> = {
+  JA:            { label: '✓ Jij: aanwezig',     bg: '#8CAA2E' },
+  ONBESCHIKBAAR: { label: '✗ Jij: onbeschikbaar', bg: '#EC2127' },
 }
 
 export default function EventCard({
   id, naam, datum, beginUur, eindUur, plaats,
-  minHulpverleners, aantalJa, isAdmin,
+  minHulpverleners, aantalJa, isAdmin, myStatus,
 }: Props) {
+  const myStatusConfig = myStatus ? MY_STATUS_CONFIG[myStatus] : undefined
   const router = useRouter()
   const d = new Date(datum)
   const today = new Date(); today.setHours(0,0,0,0)
@@ -49,6 +60,14 @@ export default function EventCard({
           <div className="flex items-center gap-2 mb-0.5">
             {isToday && <span className="badge bg-rkv-red text-white text-xs">Vandaag</span>}
             {isTomorrow && <span className="badge bg-rkv-teal text-white text-xs">Morgen</span>}
+            {myStatusConfig && (
+              <span
+                className="badge text-white text-xs rounded-full"
+                style={{ backgroundColor: myStatusConfig.bg }}
+              >
+                {myStatusConfig.label}
+              </span>
+            )}
           </div>
           <h3 className="font-bold text-rkv-teal-dark text-base leading-tight truncate group-hover:text-rkv-red transition-colors">
             {naam}

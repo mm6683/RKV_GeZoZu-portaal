@@ -18,7 +18,7 @@ export async function GET() {
     where: { isActief: true, isCancelled: false, datum: { gte: startOfToday } },
     // Binnen eenzelfde dag sorteren op startuur i.p.v. (impliciet) alfabetisch
     orderBy: [{ datum: 'asc' }, { beginUur: 'asc' }],
-    include: { attendees: { select: { status: true } } },
+    include: { attendees: { select: { volunteerId: true, status: true } } },
   })
 
   return NextResponse.json(events.map(e => ({
@@ -28,6 +28,12 @@ export async function GET() {
     plaats: e.plaats,
     minHulpverleners: e.minHulpverleners,
     aantalJa: e.attendees.filter(a => a.status === 'JA').length,
+    // Eigen status van de ingelogde gebruiker voor dit event — RESERVE geldt
+    // hier als "nog niet aangeduid" (iedereen start daar automatisch op via
+    // enrollEligibleVolunteers), dus enkel JA/ONBESCHIKBAAR is een echte
+    // keuze die de moeite waard is om te tonen. Geen attendee-record (bv.
+    // niet-ingeschreven externe) geeft null.
+    myStatus: e.attendees.find(a => a.volunteerId === session.volunteerId)?.status ?? null,
   })))
 }
 

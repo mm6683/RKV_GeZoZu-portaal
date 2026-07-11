@@ -218,11 +218,22 @@ function CalendarView({ events, month, onMonthChange, onEventClick }: {
               <div className={`text-xs font-medium text-center mb-0.5 ${isToday ? 'text-rkv-red font-bold' : 'text-rkv-teal-dark'}`}>
                 {day.getDate()}
               </div>
-              {evs.slice(0, 2).map(e => (
-                <button key={e.id} onClick={() => onEventClick(e.id)}
-                  className="w-full text-left text-[10px] bg-cta-blue text-white rounded px-1 py-0.5 mb-0.5 truncate leading-tight hover:bg-rkv-red-dark"
-                  title={e.naam}>{e.naam}</button>
-              ))}
+              {evs.slice(0, 2).map(e => {
+                // Zelfde redenering als op de EventCard: RESERVE is de
+                // automatische standaard voor iedereen, dus enkel een
+                // bewuste JA/ONBESCHIKBAAR-keuze krijgt een eigen kleur.
+                const pillColor = e.myStatus === 'JA' ? '#8CAA2E'
+                  : e.myStatus === 'ONBESCHIKBAAR' ? '#EC2127'
+                  : undefined
+                return (
+                  <button key={e.id} onClick={() => onEventClick(e.id)}
+                    className={`w-full text-left text-[10px] rounded px-1 py-0.5 mb-0.5 truncate leading-tight text-white ${pillColor ? '' : 'bg-cta-blue hover:bg-rkv-red-dark'}`}
+                    style={pillColor ? { backgroundColor: pillColor } : undefined}
+                    title={`${e.naam}${e.myStatus === 'JA' ? ' — jij: aanwezig' : e.myStatus === 'ONBESCHIKBAAR' ? ' — jij: onbeschikbaar' : ''}`}>
+                    {e.naam}
+                  </button>
+                )
+              })}
               {evs.length > 2 && <div className="text-[10px] text-rkv-teal text-center">+{evs.length - 2}</div>}
             </div>
           )
