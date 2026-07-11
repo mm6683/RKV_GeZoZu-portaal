@@ -180,7 +180,7 @@ export default function CreateVolunteerPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-rkv-red">
+          <div className="bg-red-50 dark:bg-rkv-red/10 border border-red-200 dark:border-rkv-red/30 rounded-xl px-4 py-3 text-sm text-rkv-red">
             ⚠️ {error}
           </div>
         )}

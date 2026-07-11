@@ -108,7 +108,7 @@ export default function AdminPage() {
                       {v.volledigeNaam}
                     </span>
                     {v.isAdmin && <span className="badge bg-cta-blue text-white text-xs">Admin</span>}
-                    {v.isExternal && <span className="badge bg-rkv-teal text-white text-xs">Extern</span>}
+                    {v.isExternal && <span className="badge bg-[#81A6AB] text-white text-xs">Extern</span>}
                     {v.isBlocked && <span className="badge bg-gray-400 text-white text-xs">Geblokkeerd</span>}
                   </div>
                   <div className="flex items-center gap-2 mt-0.5">

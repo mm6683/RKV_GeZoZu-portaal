@@ -6,6 +6,7 @@ import EventCard from '@/components/EventCard'
 import RankBadge from '@/components/RankBadge'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import Collapsible from '@/components/Collapsible'
+import { useScrollRestoration } from '@/hooks/useScrollRestoration'
 
 type View = 'list' | 'calendar'
 
@@ -29,6 +30,9 @@ export default function Dashboard() {
     }
     load()
   }, [])
+
+  // Herstel scrollpositie wanneer je terugkeert vanaf een event.
+  useScrollRestoration(!loading)
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -77,7 +81,7 @@ export default function Dashboard() {
               <h2 className="section-title mb-0">Opkomende evenementen</h2>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex bg-white rounded-xl border border-rkv-gray-mid overflow-hidden">
+              <div className="flex bg-white dark:bg-surface rounded-xl border border-rkv-gray-mid overflow-hidden">
                 <button onClick={() => setView('list')}
                   className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === 'list' ? 'bg-cta-blue text-white' : 'text-rkv-teal hover:bg-rkv-gray'}`}>
                   Lijst

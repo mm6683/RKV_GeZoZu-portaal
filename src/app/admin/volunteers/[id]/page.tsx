@@ -128,8 +128,8 @@ export default function AdminVolunteerDetail() {
               <p className="text-sm text-rkv-teal">{volunteer.emailWerk || '—'}</p>
               <div className="flex items-center gap-2 mt-1.5">
                 <RankBadge ranks={form.ranks} size="sm" />
-                {volunteer.isExternal && <span className="badge bg-rkv-teal text-white text-xs">Extern</span>}
-                {!hasPassword && <span className="badge bg-yellow-100 text-yellow-700 text-xs">Nog geen wachtwoord</span>}
+                {volunteer.isExternal && <span className="badge bg-[#81A6AB] text-white text-xs">Extern</span>}
+                {!hasPassword && <span className="badge bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 text-xs">Nog geen wachtwoord</span>}
               </div>
             </div>
             <button onClick={() => router.push(`/profile/${id}`)} className="btn-ghost text-sm">

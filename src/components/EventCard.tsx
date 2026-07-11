@@ -59,7 +59,7 @@ export default function EventCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             {isToday && <span className="badge bg-rkv-red text-white text-xs">Vandaag</span>}
-            {isTomorrow && <span className="badge bg-rkv-teal text-white text-xs">Morgen</span>}
+            {isTomorrow && <span className="badge bg-[#81A6AB] text-white text-xs">Morgen</span>}
           </div>
           <h3 className="font-bold text-rkv-teal-dark text-base leading-tight truncate group-hover:text-rkv-red transition-colors">
             {naam}

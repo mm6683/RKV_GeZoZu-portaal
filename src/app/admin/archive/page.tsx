@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
+import { useScrollRestoration } from '@/hooks/useScrollRestoration'
 
 export default function ArchivePage() {
   const router = useRouter()
@@ -26,6 +27,9 @@ export default function ArchivePage() {
     }
     load()
   }, [])
+
+  // Herstel scrollpositie wanneer je terugkeert vanaf een event.
+  useScrollRestoration(!loading)
 
   const years = Object.keys(byYear).map(Number).sort((a, b) => b - a)
 
@@ -84,7 +88,7 @@ export default function ArchivePage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-white rounded-xl border border-rkv-gray-mid overflow-hidden w-fit">
+        <div className="flex bg-white dark:bg-surface rounded-xl border border-rkv-gray-mid overflow-hidden w-fit">
           <button onClick={() => setTab('archief')}
             className={`px-5 py-2.5 text-sm font-medium transition-colors ${tab === 'archief' ? 'bg-cta-blue text-white' : 'text-rkv-teal hover:bg-rkv-gray'}`}>
             Voorbije events
@@ -112,7 +116,7 @@ export default function ArchivePage() {
               years.map(year => (
                 <div key={year}>
                   <h2 className="text-base font-bold text-rkv-teal-dark mb-3 flex items-center gap-2">
-                    <span className="bg-rkv-teal-dark text-white text-sm px-2.5 py-0.5 rounded-full">{year}</span>
+                    <span className="bg-[#223A3C] text-white text-sm px-2.5 py-0.5 rounded-full">{year}</span>
                     <span className="text-sm text-rkv-teal font-normal">{byYear[year].length} events</span>
                   </h2>
                   <div className="space-y-2">

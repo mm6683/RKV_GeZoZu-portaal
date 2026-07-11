@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
 import { QUAL_BADGES } from '@/lib/ranks'
+import { useScrollRestoration } from '@/hooks/useScrollRestoration'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -36,6 +37,9 @@ export default function ProfilePage() {
     }
     load()
   }, [id])
+
+  // Herstel scrollpositie wanneer je terugkeert vanaf een event.
+  useScrollRestoration(!loading)
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -116,7 +120,7 @@ export default function ProfilePage() {
                   <span className="badge bg-cta-blue text-white text-xs px-2.5 py-1">Admin</span>
                 )}
                 {profile.isExternal && (
-                  <span className="badge bg-rkv-teal text-white text-xs px-2.5 py-1">Extern</span>
+                  <span className="badge bg-[#81A6AB] text-white text-xs px-2.5 py-1">Extern</span>
                 )}
               </div>
             </div>

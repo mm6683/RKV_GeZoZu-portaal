@@ -53,7 +53,7 @@ export default function SetPasswordPage() {
       
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl shadow-sm border border-white/50 mb-4">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-white dark:bg-surface rounded-2xl shadow-sm border border-white/50 dark:border-white/10 mb-4">
             <span className="text-rkv-red text-4xl font-bold">✚</span>
           </div>
           <h1 className="text-rkv-teal-dark text-3xl font-bold">GeZoZu Portaal</h1>
@@ -113,7 +113,7 @@ export default function SetPasswordPage() {
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-rkv-red">
+              <div className="bg-red-50 dark:bg-rkv-red/10 border border-red-200 dark:border-rkv-red/30 rounded-xl px-4 py-3 text-sm text-rkv-red">
                 ⚠️ {error}
               </div>
             )}
