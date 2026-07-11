@@ -19,8 +19,8 @@ interface Props {
 // standaard voor iedereen (zie enrollEligibleVolunteers) en zou op elke
 // kaart verschijnen als we die ook zouden tonen, wat geen nuttige info geeft.
 const MY_STATUS_CONFIG: Partial<Record<AttendStatus, { label: string; bg: string }>> = {
-  JA:            { label: '✓ Jij: aanwezig',     bg: '#8CAA2E' },
-  ONBESCHIKBAAR: { label: '✗ Jij: onbeschikbaar', bg: '#EC2127' },
+  JA:            { label: '✓ aanwezig',     bg: '#8CAA2E' },
+  ONBESCHIKBAAR: { label: '✗ onbeschikbaar', bg: '#EC2127' },
 }
 
 export default function EventCard({

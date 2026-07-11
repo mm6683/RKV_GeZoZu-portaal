@@ -229,7 +229,7 @@ function CalendarView({ events, month, onMonthChange, onEventClick }: {
                   <button key={e.id} onClick={() => onEventClick(e.id)}
                     className={`w-full text-left text-[10px] rounded px-1 py-0.5 mb-0.5 truncate leading-tight text-white ${pillColor ? '' : 'bg-cta-blue hover:bg-rkv-red-dark'}`}
                     style={pillColor ? { backgroundColor: pillColor } : undefined}
-                    title={`${e.naam}${e.myStatus === 'JA' ? ' — jij: aanwezig' : e.myStatus === 'ONBESCHIKBAAR' ? ' — jij: onbeschikbaar' : ''}`}>
+                    title={`${e.naam}${e.myStatus === 'JA' ? ' — aanwezig' : e.myStatus === 'ONBESCHIKBAAR' ? ' — onbeschikbaar' : ''}`}>
                     {e.naam}
                   </button>
                 )
