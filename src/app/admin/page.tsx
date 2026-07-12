@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
-import { useScrollRestoration } from '@/hooks/useScrollRestoration'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -28,9 +27,6 @@ export default function AdminPage() {
     setVols(await volsRes.json())
     setLoading(false)
   }
-
-  // Herstel scrollpositie wanneer je terugkeert vanaf een vrijwilliger.
-  useScrollRestoration(!loading)
 
   const filtered = volunteers.filter(v => {
     const matchSearch = v.volledigeNaam.toLowerCase().includes(search.toLowerCase())

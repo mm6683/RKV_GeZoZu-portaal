@@ -5,7 +5,6 @@ import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
 import { QUAL_BADGES } from '@/lib/ranks'
-import { useScrollRestoration } from '@/hooks/useScrollRestoration'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -37,9 +36,6 @@ export default function ProfilePage() {
     }
     load()
   }, [id])
-
-  // Herstel scrollpositie wanneer je terugkeert vanaf een event.
-  useScrollRestoration(!loading)
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">

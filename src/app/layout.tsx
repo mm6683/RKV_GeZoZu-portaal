@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Ubuntu } from 'next/font/google'
+import ScrollRestorer from '@/components/ScrollRestorer'
 import './globals.css'
 
 const ubuntu = Ubuntu({
@@ -27,7 +28,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className={ubuntu.className}>{children}</body>
+      <body className={ubuntu.className}>
+        <ScrollRestorer />
+        {children}
+      </body>
     </html>
   )
 }

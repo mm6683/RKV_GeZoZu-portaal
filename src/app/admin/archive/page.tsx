@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
-import { useScrollRestoration } from '@/hooks/useScrollRestoration'
 
 export default function ArchivePage() {
   const router = useRouter()
@@ -27,9 +26,6 @@ export default function ArchivePage() {
     }
     load()
   }, [])
-
-  // Herstel scrollpositie wanneer je terugkeert vanaf een event.
-  useScrollRestoration(!loading)
 
   const years = Object.keys(byYear).map(Number).sort((a, b) => b - a)
 

@@ -6,7 +6,6 @@ import EventCard from '@/components/EventCard'
 import RankBadge from '@/components/RankBadge'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import Collapsible from '@/components/Collapsible'
-import { useScrollRestoration } from '@/hooks/useScrollRestoration'
 
 type View = 'list' | 'calendar'
 
@@ -30,9 +29,6 @@ export default function Dashboard() {
     }
     load()
   }, [])
-
-  // Herstel scrollpositie wanneer je terugkeert vanaf een event.
-  useScrollRestoration(!loading)
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
