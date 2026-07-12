@@ -90,7 +90,7 @@ export default function CreateEventPage() {
 
   return (
     <div className="min-h-screen bg-rkv-gray">
-      <Navbar naam={me.volledigeNaam} pfpUrl={me.pfpUrl} isAdmin />
+      <Navbar naam={me.volledigeNaam} id={me.id} displayName={me.displayName} voornaam={me.voornaam} pfpUrl={me.pfpUrl} isAdmin />
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
         <button onClick={() => router.push('/dashboard')} className="text-rkv-teal text-sm flex items-center gap-1 hover:text-rkv-red">
           ‹ Terug

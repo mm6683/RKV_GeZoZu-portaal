@@ -267,7 +267,7 @@ export default function EventDetailPage() {
 
   return (
     <div className="min-h-screen bg-rkv-gray">
-      <Navbar naam={me?.volledigeNaam} pfpUrl={me?.pfpUrl} isAdmin={me?.isAdmin} />
+      <Navbar naam={me?.volledigeNaam} id={me?.id} displayName={me?.displayName} voornaam={me?.voornaam} pfpUrl={me?.pfpUrl} isAdmin={me?.isAdmin} />
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
         <button

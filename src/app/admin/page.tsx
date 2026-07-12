@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
+import { useScrollRestoration } from '@/hooks/useScrollRestoration'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -28,6 +29,9 @@ export default function AdminPage() {
     setLoading(false)
   }
 
+  // Herstel scrollpositie wanneer je terugkeert vanaf een vrijwilliger.
+  useScrollRestoration(!loading)
+
   const filtered = volunteers.filter(v => {
     const matchSearch = v.volledigeNaam.toLowerCase().includes(search.toLowerCase())
       || v.rkvId.includes(search)
@@ -43,7 +47,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-rkv-gray">
-      <Navbar naam={me.volledigeNaam} pfpUrl={me.pfpUrl} isAdmin />
+      <Navbar naam={me.volledigeNaam} id={me.id} displayName={me.displayName} voornaam={me.voornaam} pfpUrl={me.pfpUrl} isAdmin />
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
         <div className="flex items-center justify-between">

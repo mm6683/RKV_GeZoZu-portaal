@@ -6,13 +6,21 @@ import ThemeToggle from './ThemeToggle'
 
 interface Props {
   naam: string
+  id?: string
+  displayName?: string | null
+  voornaam?: string
   pfpUrl: string | null
   isAdmin: boolean
 }
 
-export default function Navbar({ naam, pfpUrl, isAdmin }: Props) {
+export default function Navbar({ naam, id, displayName, voornaam, pfpUrl, isAdmin }: Props) {
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
+
+  // Naam naast de avatar: displayName heeft voorrang, anders de voornaam.
+  // Als geen van beide (nog) bekend is, val terug op de voornaam uit de
+  // volledige naam zodat er nooit niets staat tijdens het laden.
+  const shortName = displayName || voornaam || naam.split(' ')[0]
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' })
@@ -35,6 +43,11 @@ export default function Navbar({ naam, pfpUrl, isAdmin }: Props) {
         <button onClick={() => router.push('/dashboard')} className="text-rkv-teal-dark/80 hover:text-rkv-teal-dark px-3 py-1 rounded-lg hover:bg-rkv-gray transition-colors text-sm">
           Home
         </button>
+        {id && (
+          <button onClick={() => router.push(`/profile/${id}`)} className="text-rkv-teal-dark/80 hover:text-rkv-teal-dark px-3 py-1 rounded-lg hover:bg-rkv-gray transition-colors text-sm">
+            Profiel
+          </button>
+        )}
         {isAdmin && (
           <button onClick={() => router.push('/admin')} className="text-rkv-teal-dark/80 hover:text-rkv-teal-dark px-3 py-1 rounded-lg hover:bg-rkv-gray transition-colors text-sm">
             Admin
@@ -53,7 +66,7 @@ export default function Navbar({ naam, pfpUrl, isAdmin }: Props) {
           >
             <VolunteerAvatar pfpUrl={pfpUrl} naam={naam} size={32} />
             <span className="text-rkv-teal-dark text-sm font-medium hidden sm:block max-w-[120px] truncate">
-              {naam.split(' ')[0]}
+              {shortName}
             </span>
             <span className="text-rkv-teal-dark/70 text-xs">▾</span>
           </button>
@@ -68,6 +81,12 @@ export default function Navbar({ naam, pfpUrl, isAdmin }: Props) {
                 className="w-full text-left px-4 py-2.5 text-sm text-rkv-teal-dark hover:bg-rkv-gray transition-colors">
                 🏠 Home
               </button>
+              {id && (
+                <button onClick={() => { setMenuOpen(false); router.push(`/profile/${id}`) }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-rkv-teal-dark hover:bg-rkv-gray transition-colors">
+                  👤 Profiel
+                </button>
+              )}
               {isAdmin && (
                 <button onClick={() => { setMenuOpen(false); router.push('/admin') }}
                   className="w-full text-left px-4 py-2.5 text-sm text-rkv-teal-dark hover:bg-rkv-gray transition-colors">
