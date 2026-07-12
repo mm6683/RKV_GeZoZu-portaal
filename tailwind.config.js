@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
@@ -8,14 +9,23 @@ module.exports = {
       },
       colors: {
         // Primaire kleuren
+        // teal, teal-dark, gray en gray-mid zijn gekoppeld aan CSS-variabelen
+        // (zie globals.css) zodat ze automatisch omschakelen in dark mode —
+        // dit zijn immers vooral de "neutrale" tekst-/achtergrondkleuren die
+        // overal in de app gebruikt worden. red/red-dark blijven bewust vaste
+        // kleuren: het zijn accentkleuren die in beide modi hetzelfde moeten
+        // ogen (bv. badges met witte tekst erop).
         rkv: {
           red:       '#EC2127',
           'red-dark':'#b5191e',
-          teal:      '#81A6AB',
-          'teal-dark':'#223A3C',
-          gray:      '#EEF1F4',
-          'gray-mid':'#c5cdd5',
+          teal:      'rgb(var(--color-text-secondary) / <alpha-value>)',
+          'teal-dark':'rgb(var(--color-text) / <alpha-value>)',
+          gray:      'rgb(var(--color-bg) / <alpha-value>)',
+          'gray-mid':'rgb(var(--color-bg-mid) / <alpha-value>)',
         },
+        // Oppervlak van kaarten/navbar/dropdowns — vervangt "white" op
+        // plekken waar dat oppervlak in dark mode donker moet worden.
+        surface: 'rgb(var(--color-surface) / <alpha-value>)',
         cta: {
           blue: '#0591e2',
           'blue-dark': '#0477b8',

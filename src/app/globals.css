@@ -4,6 +4,23 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* "R G B" triplets (geen rgb()-wrapper) zodat Tailwind's <alpha-value>
+       er opaciteit-varianten van kan maken, bv. bg-rkv-gray/50. */
+    --color-bg:              238 241 244; /* rkv-gray     #EEF1F4 */
+    --color-bg-mid:          197 205 213; /* rkv-gray-mid #c5cdd5 */
+    --color-text:             34  58  60; /* rkv-teal-dark #223A3C */
+    --color-text-secondary: 129 166 171; /* rkv-teal     #81A6AB */
+    --color-surface:        255 255 255; /* kaarten/navbar-oppervlak */
+  }
+  .dark {
+    --color-bg:               15  22  24;
+    --color-bg-mid:            56  72  75;
+    --color-text:             225 235 236;
+    --color-text-secondary:  148 179 184;
+    --color-surface:           24  33  36;
+  }
+
   * { box-sizing: border-box; }
   body {
     @apply bg-rkv-gray text-rkv-teal-dark font-sans;
@@ -30,17 +47,17 @@
            hover:bg-rkv-gray transition-colors;
   }
   .card {
-    @apply bg-white/90 backdrop-blur-md border border-white/50 rounded-2xl shadow-card p-6 transition-all duration-300;
+    @apply bg-white/90 dark:bg-surface/90 backdrop-blur-md border border-white/50 dark:border-white/10 rounded-2xl shadow-card dark:shadow-none p-6 transition-all duration-300;
   }
   .input {
-    @apply w-full border border-rkv-gray-mid/50 rounded-xl px-4 py-3 text-sm shadow-sm
-           focus:outline-none focus:border-cta-blue focus:ring-2 focus:ring-cta-blue/20 transition-all bg-white/80 backdrop-blur-sm;
+    @apply w-full border border-rkv-gray-mid/50 dark:border-white/10 rounded-xl px-4 py-3 text-sm shadow-sm
+           focus:outline-none focus:border-cta-blue focus:ring-2 focus:ring-cta-blue/20 transition-all bg-white/80 dark:bg-surface/80 backdrop-blur-sm;
   }
   .label {
     @apply block text-xs font-medium text-rkv-teal-dark mb-1.5 uppercase tracking-wide;
   }
   .nav-bar {
-    @apply bg-white/90 backdrop-blur-md border-b border-rkv-gray text-rkv-teal-dark px-6 py-0 flex items-center justify-between h-14 shadow-sm sticky top-0 z-50 transition-all duration-300;
+    @apply bg-white/90 dark:bg-surface/90 backdrop-blur-md border-b border-rkv-gray dark:border-white/10 text-rkv-teal-dark px-6 py-0 flex items-center justify-between h-14 shadow-sm sticky top-0 z-50 transition-all duration-300;
   }
   .section-title {
     @apply text-lg font-bold text-rkv-teal-dark mb-4;
@@ -54,3 +71,5 @@
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #EEF1F4; }
 ::-webkit-scrollbar-thumb { background: #81A6AB; border-radius: 3px; }
+.dark ::-webkit-scrollbar-track { background: #0f1618; }
+.dark ::-webkit-scrollbar-thumb { background: #4a6469; }

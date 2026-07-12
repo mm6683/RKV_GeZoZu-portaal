@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Ubuntu } from 'next/font/google'
+import ScrollRestorer from '@/components/ScrollRestorer'
 import './globals.css'
 
 const ubuntu = Ubuntu({
@@ -16,7 +17,21 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="nl">
-      <body className={ubuntu.className}>{children}</body>
+      <head>
+        {/* Zet de dark-mode klasse al vóór de eerste paint, op basis van de
+            eerder gekozen voorkeur (localStorage) of anders het systeem-
+            thema. Dit voorkomt een korte flits van het verkeerde thema bij
+            het laden van de pagina. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem('theme');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className={ubuntu.className}>
+        <ScrollRestorer />
+        {children}
+      </body>
     </html>
   )
 }

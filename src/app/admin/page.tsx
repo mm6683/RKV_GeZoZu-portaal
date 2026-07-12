@@ -43,7 +43,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-rkv-gray">
-      <Navbar naam={me.volledigeNaam} pfpUrl={me.pfpUrl} isAdmin />
+      <Navbar naam={me.volledigeNaam} id={me.id} displayName={me.displayName} voornaam={me.voornaam} pfpUrl={me.pfpUrl} isAdmin />
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
         <div className="flex items-center justify-between">
@@ -108,7 +108,7 @@ export default function AdminPage() {
                       {v.volledigeNaam}
                     </span>
                     {v.isAdmin && <span className="badge bg-cta-blue text-white text-xs">Admin</span>}
-                    {v.isExternal && <span className="badge bg-rkv-teal text-white text-xs">Extern</span>}
+                    {v.isExternal && <span className="badge bg-[#81A6AB] text-white text-xs">Extern</span>}
                     {v.isBlocked && <span className="badge bg-gray-400 text-white text-xs">Geblokkeerd</span>}
                   </div>
                   <div className="flex items-center gap-2 mt-0.5">

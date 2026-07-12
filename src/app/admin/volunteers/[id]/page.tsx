@@ -112,10 +112,13 @@ export default function AdminVolunteerDetail() {
 
   return (
     <div className="min-h-screen bg-rkv-gray">
-      <Navbar naam={me?.volledigeNaam} pfpUrl={me?.pfpUrl} isAdmin />
+      <Navbar naam={me?.volledigeNaam} id={me?.id} displayName={me?.displayName} voornaam={me?.voornaam} pfpUrl={me?.pfpUrl} isAdmin />
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
-        <button onClick={() => router.push('/admin')} className="text-rkv-teal text-sm flex items-center gap-1 hover:text-rkv-red">
+        <button
+          onClick={() => { if (window.history.length > 1) router.back(); else router.push('/admin') }}
+          className="text-rkv-teal text-sm flex items-center gap-1 hover:text-rkv-red"
+        >
           ‹ Terug naar overzicht
         </button>
 
@@ -128,8 +131,8 @@ export default function AdminVolunteerDetail() {
               <p className="text-sm text-rkv-teal">{volunteer.emailWerk || '—'}</p>
               <div className="flex items-center gap-2 mt-1.5">
                 <RankBadge ranks={form.ranks} size="sm" />
-                {volunteer.isExternal && <span className="badge bg-rkv-teal text-white text-xs">Extern</span>}
-                {!hasPassword && <span className="badge bg-yellow-100 text-yellow-700 text-xs">Nog geen wachtwoord</span>}
+                {volunteer.isExternal && <span className="badge bg-[#81A6AB] text-white text-xs">Extern</span>}
+                {!hasPassword && <span className="badge bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 text-xs">Nog geen wachtwoord</span>}
               </div>
             </div>
             <button onClick={() => router.push(`/profile/${id}`)} className="btn-ghost text-sm">

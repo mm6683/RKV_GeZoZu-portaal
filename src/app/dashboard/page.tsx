@@ -41,7 +41,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-rkv-gray">
-      <Navbar naam={me.volledigeNaam} pfpUrl={me.pfpUrl} isAdmin={me.isAdmin} />
+      <Navbar naam={me.volledigeNaam} id={me.id} displayName={me.displayName} voornaam={me.voornaam} pfpUrl={me.pfpUrl} isAdmin={me.isAdmin} />
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
 
@@ -77,7 +77,7 @@ export default function Dashboard() {
               <h2 className="section-title mb-0">Opkomende evenementen</h2>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex bg-white rounded-xl border border-rkv-gray-mid overflow-hidden">
+              <div className="flex bg-white dark:bg-surface rounded-xl border border-rkv-gray-mid overflow-hidden">
                 <button onClick={() => setView('list')}
                   className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === 'list' ? 'bg-cta-blue text-white' : 'text-rkv-teal hover:bg-rkv-gray'}`}>
                   Lijst

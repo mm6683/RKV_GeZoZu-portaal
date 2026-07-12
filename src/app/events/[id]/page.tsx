@@ -267,10 +267,13 @@ export default function EventDetailPage() {
 
   return (
     <div className="min-h-screen bg-rkv-gray">
-      <Navbar naam={me?.volledigeNaam} pfpUrl={me?.pfpUrl} isAdmin={me?.isAdmin} />
+      <Navbar naam={me?.volledigeNaam} id={me?.id} displayName={me?.displayName} voornaam={me?.voornaam} pfpUrl={me?.pfpUrl} isAdmin={me?.isAdmin} />
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
-        <button onClick={() => router.push('/dashboard')} className="text-rkv-teal text-sm flex items-center gap-1 hover:text-rkv-red">
+        <button
+          onClick={() => { if (window.history.length > 1) router.back(); else router.push('/dashboard') }}
+          className="text-rkv-teal text-sm flex items-center gap-1 hover:text-rkv-red"
+        >
           ‹ Terug
         </button>
 
@@ -420,14 +423,14 @@ export default function EventDetailPage() {
 
         {/* ── Melding: SB te laag ──────────────────────────────── */}
         {isBelowMinRank && !event.isCancelled && (
-          <div className="card" style={{ backgroundColor: '#fffbeb', borderColor: '#f3a400', border: '1px solid' }}>
+          <div className="card bg-amber-50 dark:bg-amber-500/10 border border-amber-400 dark:border-amber-400/40">
             <div className="flex items-start gap-3">
               <span className="text-xl flex-shrink-0">⚠️</span>
               <div>
-                <p className="text-sm font-semibold" style={{ color: '#92400e' }}>
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
                   Je SB voldoet niet aan de minimumvereiste
                 </p>
-                <p className="text-xs mt-0.5" style={{ color: '#b45309' }}>
+                <p className="text-xs mt-0.5 text-amber-700 dark:text-amber-400">
                   Dit event vereist minimum SB{' '}
                   <strong style={{ color: getRankConfig(event.minRank).color }}>
                     {getRankConfig(event.minRank).label}
@@ -450,7 +453,7 @@ export default function EventDetailPage() {
                   + Externe toevoegen
                 </button>
                 {showExternDropdown && (
-                  <div className="absolute right-0 top-10 bg-white rounded-xl shadow-card-hover w-72 z-50 border border-rkv-gray-mid">
+                  <div className="absolute right-0 top-10 bg-white dark:bg-surface rounded-xl shadow-card-hover w-72 z-50 border border-rkv-gray-mid">
                     <div className="p-2 border-b border-rkv-gray">
                       <input className="input text-sm py-2" placeholder="🔍 Zoek vrijwilliger..."
                         value={externSearch} onChange={e => setExternSearch(e.target.value)} autoFocus />

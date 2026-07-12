@@ -81,7 +81,7 @@ export default function CreateVolunteerPage() {
 
   return (
     <div className="min-h-screen bg-rkv-gray">
-      <Navbar naam={me.volledigeNaam} pfpUrl={me.pfpUrl} isAdmin />
+      <Navbar naam={me.volledigeNaam} id={me.id} displayName={me.displayName} voornaam={me.voornaam} pfpUrl={me.pfpUrl} isAdmin />
 
       <div className="max-w-xl mx-auto px-4 py-6 space-y-5">
         <button onClick={() => router.push('/admin')} className="text-rkv-teal text-sm flex items-center gap-1 hover:text-rkv-red">
@@ -180,7 +180,7 @@ export default function CreateVolunteerPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-rkv-red">
+          <div className="bg-red-50 dark:bg-rkv-red/10 border border-red-200 dark:border-rkv-red/30 rounded-xl px-4 py-3 text-sm text-rkv-red">
             ⚠️ {error}
           </div>
         )}
