@@ -51,6 +51,8 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
       ranks: a.volunteer.ranks,
       highestQual: getHighestQual(a.volunteer.qualifications),
       status: a.status,
+      // Opmerkingen zijn privé: enkel de vrijwilliger zelf of een admin mag ze zien.
+      opmerking: (session.isAdmin || a.volunteerId === session.volunteerId) ? a.opmerking : null,
     })),
   })
 }
