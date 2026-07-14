@@ -6,20 +6,40 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const session = await getSession()
   if (!session.isAuthenticated) return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
 
-  const { volunteerId, status } = await req.json()
+  const { volunteerId, status, opmerking } = await req.json()
 
-  if (!['RESERVE', 'JA', 'ONBESCHIKBAAR'].includes(status)) {
+  // Status is optioneel geworden: een aanroep kan enkel de opmerking bijwerken
+  // (bv. vanuit het opmerkingveld) zonder de beschikbaarheid te wijzigen.
+  if (status !== undefined && !['RESERVE', 'JA', 'ONBESCHIKBAAR'].includes(status)) {
     return NextResponse.json({ error: 'Ongeldige status' }, { status: 400 })
   }
+  if (opmerking !== undefined && typeof opmerking !== 'string') {
+    return NextResponse.json({ error: 'Ongeldige opmerking' }, { status: 400 })
+  }
 
+  // Enkel jezelf, of eender wie als je admin bent — dit geldt zowel voor de
+  // beschikbaarheidsstatus als voor de opmerking (admins mogen ieders
+  // opmerking bekijken/bewerken).
   if (!session.isAdmin && volunteerId !== session.volunteerId) {
     return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
   }
 
+  const trimmedOpmerking = typeof opmerking === 'string' ? opmerking.trim().slice(0, 500) : undefined
+
   const attendee = await prisma.eventAttendee.upsert({
     where: { eventId_volunteerId: { eventId: params.id, volunteerId } },
-    update: { status, updatedById: session.volunteerId },
-    create: { eventId: params.id, volunteerId, status, updatedById: session.volunteerId },
+    update: {
+      updatedById: session.volunteerId,
+      ...(status !== undefined && { status }),
+      ...(trimmedOpmerking !== undefined && { opmerking: trimmedOpmerking || null }),
+    },
+    create: {
+      eventId: params.id,
+      volunteerId,
+      status: status ?? 'RESERVE',
+      opmerking: trimmedOpmerking || null,
+      updatedById: session.volunteerId,
+    },
   })
 
   return NextResponse.json(attendee)

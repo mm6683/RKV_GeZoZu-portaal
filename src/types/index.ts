@@ -46,4 +46,5 @@ export interface AttendeePublic {
   ranks: string[]
   highestQual: { naam: string; type: QualType; color: string } | null
   status: AttendStatus
+  opmerking: string | null
 }

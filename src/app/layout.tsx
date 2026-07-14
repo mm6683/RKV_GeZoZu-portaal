@@ -9,9 +9,27 @@ const ubuntu = Ubuntu({
   display: 'swap',
 })
 
+const DESCRIPTION = 'Een onofficieel vrijwilligersportaal voor Rode Kruis Vlaanderen afdeling Genk-Zonhoven-Zutendaal primair voor shiftmanagement.'
+
 export const metadata: Metadata = {
-  title: 'GeZoZu Vrijwilligersportaal',
-  description: 'Onofficieel portaal voor vrijwilligers van Rode Kruis afdeling Genk-Zonhoven-Zutendaal',
+  // Zet dit op je echte productie-domein (bv. new URL('https://gezozu.pages.dev'))
+  // zodra dat vaststaat — anders bouwt Next.js de og:image-URL mogelijk relatief
+  // op, wat sommige crawlers (Facebook/Slack/…) niet correct oppikken.
+  // metadataBase: new URL('https://JOUW-DOMEIN-HIER'),
+  title: 'GeZoZu Portaal',
+  description: DESCRIPTION,
+  openGraph: {
+    title: 'GeZoZu Portaal',
+    description: DESCRIPTION,
+    siteName: 'GeZoZu Portaal',
+    locale: 'nl_BE',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'GeZoZu Portaal',
+    description: DESCRIPTION,
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

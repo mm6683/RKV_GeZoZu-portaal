@@ -29,14 +29,18 @@ export default function Navbar({ naam, id, displayName, voornaam, pfpUrl, isAdmi
 
   return (
     <nav className="nav-bar">
-      {/* Logo + naam */}
-      <div className="flex items-center gap-3">
+      {/* Logo + naam — klikbaar, brengt terug naar het dashboard */}
+      <button
+        onClick={() => router.push('/dashboard')}
+        className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        title="Naar dashboard"
+      >
         <span className="text-rkv-red text-2xl font-bold leading-none">✚</span>
-        <div className="hidden sm:block">
+        <div className="hidden sm:block text-left">
           <div className="text-rkv-teal-dark font-bold text-sm leading-tight">GeZoZu Portaal</div>
           <div className="text-rkv-teal-dark/70 text-xs">Genk · Zonhoven · Zutendaal</div>
         </div>
-      </div>
+      </button>
 
       {/* Navigatie links (desktop) */}
       <div className="hidden md:flex items-center gap-1">
