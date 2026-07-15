@@ -65,7 +65,7 @@ export default function EventCard({
             {naam}
           </h3>
           <p className="text-sm text-rkv-teal mt-0.5">
-            🕐 {beginUur} – {eindUur} &nbsp;·&nbsp; 📍 {plaats}
+            {beginUur} – {eindUur} &nbsp;·&nbsp; 📍 {plaats}
           </p>
           {myStatusConfig && (
             <span
