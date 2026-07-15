@@ -618,7 +618,7 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
               <button
                 onClick={onToggleComment}
                 title={a.opmerking ? 'Opmerking bewerken' : 'Opmerking toevoegen'}
-                className="text-rkv-teal/30 hover:text-rkv-teal transition-colors text-sm leading-none shrink-0"
+                className="text-rkv-teal/60 hover:text-rkv-teal transition-colors text-sm leading-none shrink-0"
               >
                 ✎
               </button>
@@ -662,30 +662,53 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
   )
 }
 
-// Klein, onopvallend tekstveld voor de opmerking-inline-editor. Slaat op en
-// sluit zichzelf zodra je het veld verlaat (blur) — geen aparte knoppen nodig.
+// Klein, onopvallend tekstveld voor de opmerking-inline-editor, met een
+// klein opslaan-knopje ernaast. Slaat ook automatisch op zodra je het veld
+// verlaat (blur), het knopje is vooral voor duidelijke, expliciete controle.
 function InlineCommentEditor({ value, onSave, onDone, placeholder, rows = 2, autoFocus = true }: {
   value: string; onSave: (v: string) => void | Promise<void>; onDone: () => void
   placeholder?: string; rows?: number; autoFocus?: boolean
 }) {
   const [text, setText] = useState(value)
+  const [saving, setSaving] = useState(false)
 
-  async function handleBlur() {
-    if (text !== value) await onSave(text)
+  async function commitAndClose() {
+    if (text !== value) {
+      setSaving(true)
+      await onSave(text)
+      setSaving(false)
+    }
     onDone()
   }
 
   return (
-    <textarea
-      autoFocus={autoFocus}
-      className="input resize-none text-xs py-1.5"
-      rows={rows}
-      maxLength={500}
-      placeholder={placeholder}
-      value={text}
-      onClick={e => e.stopPropagation()}
-      onChange={e => setText(e.target.value)}
-      onBlur={handleBlur}
-    />
+    <div className="flex items-end gap-1.5">
+      <div className="flex-1 min-w-0">
+        <textarea
+          autoFocus={autoFocus}
+          className="input resize-none text-xs py-1.5"
+          rows={rows}
+          maxLength={500}
+          placeholder={placeholder}
+          value={text}
+          onClick={e => e.stopPropagation()}
+          onChange={e => setText(e.target.value)}
+          onBlur={commitAndClose}
+        />
+      </div>
+      <button
+        type="button"
+        // Voorkomt dat de textarea al blurt (en dus al opslaat/sluit) vóór
+        // deze klik geregistreerd wordt.
+        onMouseDown={e => e.preventDefault()}
+        onClick={commitAndClose}
+        disabled={saving}
+        title="Opmerking opslaan"
+        className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold transition-all disabled:opacity-60"
+        style={{ backgroundColor: '#8CAA2E', color: '#fff' }}
+      >
+        ✓
+      </button>
+    </div>
   )
 }
