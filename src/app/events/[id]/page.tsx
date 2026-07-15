@@ -443,16 +443,6 @@ export default function EventDetailPage() {
                 )
               })}
             </div>
-
-            {/* Eigen opmerking bij mijn beschikbaarheid */}
-            <div className="mt-4 pt-4 border-t border-rkv-gray">
-              <label className="label">Opmerking (optioneel)</label>
-              <CommentField
-                value={myAttendance.opmerking || ''}
-                onSave={v => saveComment(me.id, v)}
-                placeholder="Bv. ik kan pas vanaf 14u binnen zijn, of ik heb geen rijbewijs bij…"
-              />
-            </div>
           </div>
         )}
 
@@ -573,121 +563,115 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
   ]
 
   const canEdit = !disabled && (isMe || isAdmin)
-  // Enkel admins krijgen het opmerking-potloodje — zij mogen ieders opmerking
-  // bekijken/bewerken, andere vrijwilligers zien enkel hun eigen (hierboven
-  // bij "Mijn beschikbaarheid").
-  const showCommentToggle = isAdmin && !disabled && !!onToggleComment
+  // Enkel jezelf (je eigen opmerking) of een admin (ieders opmerking) mag
+  // de opmerking bekijken/bewerken.
+  const canEditComment = canEdit && !!onToggleComment && !!onSaveComment
 
   return (
-    <div>
-      <div className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${isMe ? 'bg-rkv-red/5 ring-1 ring-rkv-red/20' : 'hover:bg-rkv-gray'}`}>
-        <VolunteerAvatar pfpUrl={a.pfpUrl} naam={a.volledigeNaam} size={36} />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm font-semibold text-rkv-teal-dark truncate">
-              {a.displayName || a.volledigeNaam}
-            </span>
-            {isMe && <span className="text-xs text-rkv-red font-medium">(jij)</span>}
-          </div>
-          <div className="flex items-center gap-2 mt-0.5">
-            <RankBadge ranks={a.ranks} size="sm" />
-            <span className="text-xs text-rkv-teal">{a.hoofdentiteit}</span>
-          </div>
+    <div className={`flex items-start gap-3 p-2.5 rounded-xl transition-colors ${isMe ? 'bg-rkv-red/5 ring-1 ring-rkv-red/20' : 'hover:bg-rkv-gray'}`}>
+      <VolunteerAvatar pfpUrl={a.pfpUrl} naam={a.volledigeNaam} size={36} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm font-semibold text-rkv-teal-dark truncate">
+            {a.displayName || a.volledigeNaam}
+          </span>
+          {isMe && <span className="text-xs text-rkv-red font-medium">(jij)</span>}
+        </div>
+        <div className="flex items-center gap-2 mt-0.5">
+          <RankBadge ranks={a.ranks} size="sm" />
+          <span className="text-xs text-rkv-teal">{a.hoofdentiteit}</span>
         </div>
 
-        {canEdit ? (
-          <div className="flex gap-1 items-center">
-            {STATUS_BTNS.map(({ status, label, activeColor }) => {
-              const isActive = a.status === status
-              return (
-                <button key={status} disabled={loading} onClick={() => onStatusChange(status)}
-                  title={status}
-                  className="w-7 h-7 rounded-lg text-xs font-bold transition-all"
-                  style={isActive
-                    ? { backgroundColor: activeColor, color: '#fff' }
-                    : { backgroundColor: '#EEF1F4', color: '#223A3C' }}>
-                  {label}
-                </button>
-              )
-            })}
-            {showCommentToggle && (
+        {/* Opmerking — verschijnt onder de vrijwilliger, met wat extra
+            ruimte als er effectief iets is ingevuld. Het potloodje is klein
+            en onopvallend en staat vlak naast (of in de plaats van) de tekst. */}
+        {canEditComment && (
+          commentOpen ? (
+            <div className="mt-1.5" onClick={e => e.stopPropagation()}>
+              <InlineCommentEditor
+                value={a.opmerking || ''}
+                onSave={onSaveComment!}
+                onDone={() => onToggleComment!()}
+                placeholder="Opmerking toevoegen…"
+              />
+            </div>
+          ) : (
+            <div className={`flex items-start gap-1.5 ${a.opmerking ? 'mt-1.5' : 'mt-0.5'}`}>
+              {a.opmerking && (
+                <span className="text-xs text-rkv-teal-dark/70 italic leading-snug break-words">
+                  {a.opmerking}
+                </span>
+              )}
               <button
                 onClick={onToggleComment}
-                title="Opmerking bekijken/bewerken"
-                className="w-7 h-7 rounded-lg text-xs font-bold transition-all ml-1"
-                style={commentOpen
-                  ? { backgroundColor: '#0591e2', color: '#fff' }
-                  : { backgroundColor: '#EEF1F4', color: '#223A3C' }}>
+                title={a.opmerking ? 'Opmerking bewerken' : 'Opmerking toevoegen'}
+                className="text-rkv-teal/30 hover:text-rkv-teal transition-colors text-[11px] leading-none shrink-0"
+              >
                 ✎
               </button>
-            )}
-            {onRemove && (
-              <button
-                onClick={onRemove}
-                title="Externe vrijwilliger verwijderen"
-                className="w-7 h-7 rounded-lg text-xs font-bold transition-all ml-1"
-                style={{ backgroundColor: '#FEE2E2', color: '#EC2127' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#EC2127'; (e.currentTarget as HTMLButtonElement).style.color = '#fff' }}
-                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FEE2E2'; (e.currentTarget as HTMLButtonElement).style.color = '#EC2127' }}
-              >
-                ✕
-              </button>
-            )}
-          </div>
-        ) : (
-          <StatusBadge status={a.status} compact />
+            </div>
+          )
         )}
       </div>
 
-      {showCommentToggle && commentOpen && onSaveComment && (
-        <div className="pl-[58px] pr-1 pb-2 -mt-1">
-          <CommentField
-            value={a.opmerking || ''}
-            onSave={onSaveComment}
-            placeholder={`Nog geen opmerking van ${a.displayName || a.volledigeNaam}…`}
-          />
+      {canEdit ? (
+        <div className="flex gap-1 items-center">
+          {STATUS_BTNS.map(({ status, label, activeColor }) => {
+            const isActive = a.status === status
+            return (
+              <button key={status} disabled={loading} onClick={() => onStatusChange(status)}
+                title={status}
+                className="w-7 h-7 rounded-lg text-xs font-bold transition-all"
+                style={isActive
+                  ? { backgroundColor: activeColor, color: '#fff' }
+                  : { backgroundColor: '#EEF1F4', color: '#223A3C' }}>
+                {label}
+              </button>
+            )
+          })}
+          {onRemove && (
+            <button
+              onClick={onRemove}
+              title="Externe vrijwilliger verwijderen"
+              className="w-7 h-7 rounded-lg text-xs font-bold transition-all ml-1"
+              style={{ backgroundColor: '#FEE2E2', color: '#EC2127' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#EC2127'; (e.currentTarget as HTMLButtonElement).style.color = '#fff' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FEE2E2'; (e.currentTarget as HTMLButtonElement).style.color = '#EC2127' }}
+            >
+              ✕
+            </button>
+          )}
         </div>
+      ) : (
+        <StatusBadge status={a.status} compact />
       )}
     </div>
   )
 }
 
-// Tekstveld dat automatisch opslaat zodra je het verlaat (blur), met een
-// korte "Opslaan…" / "✓ Opgeslagen" statusindicator. Gedeeld tussen de eigen
-// opmerking (Mijn beschikbaarheid) en de admin-opmerkingbox per vrijwilliger.
-function CommentField({ value, onSave, placeholder }: {
-  value: string; onSave: (v: string) => void | Promise<void>; placeholder?: string
+// Klein, onopvallend tekstveld voor de opmerking-inline-editor. Slaat op en
+// sluit zichzelf zodra je het veld verlaat (blur) — geen aparte knoppen nodig.
+function InlineCommentEditor({ value, onSave, onDone, placeholder }: {
+  value: string; onSave: (v: string) => void | Promise<void>; onDone: () => void; placeholder?: string
 }) {
   const [text, setText] = useState(value)
-  const [saving, setSaving] = useState(false)
-  const [justSaved, setJustSaved] = useState(false)
-
-  useEffect(() => { setText(value) }, [value])
 
   async function handleBlur() {
-    if (text === value) return
-    setSaving(true)
-    await onSave(text)
-    setSaving(false)
-    setJustSaved(true)
-    setTimeout(() => setJustSaved(false), 2000)
+    if (text !== value) await onSave(text)
+    onDone()
   }
 
   return (
-    <div>
-      <textarea
-        className="input resize-none text-sm"
-        rows={2}
-        maxLength={500}
-        placeholder={placeholder}
-        value={text}
-        onChange={e => { setText(e.target.value); setJustSaved(false) }}
-        onBlur={handleBlur}
-      />
-      <div className="h-4 mt-1 text-xs">
-        {saving && <span className="text-rkv-teal">Opslaan…</span>}
-        {!saving && justSaved && <span className="text-rank-green font-medium">✓ Opgeslagen</span>}
-      </div>
-    </div>
+    <textarea
+      autoFocus
+      className="input resize-none text-xs py-1.5"
+      rows={2}
+      maxLength={500}
+      placeholder={placeholder}
+      value={text}
+      onClick={e => e.stopPropagation()}
+      onChange={e => setText(e.target.value)}
+      onBlur={handleBlur}
+    />
   )
 }
