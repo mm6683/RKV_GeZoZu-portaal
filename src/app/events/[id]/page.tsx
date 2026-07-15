@@ -443,6 +443,19 @@ export default function EventDetailPage() {
                 )
               })}
             </div>
+
+            {/* Eigen opmerking — compacte, altijd zichtbare versie van dezelfde
+                inline-editor die ook per rij bij Hulpverleners staat. */}
+            <div className="mt-3 pt-3 border-t border-rkv-gray">
+              <InlineCommentEditor
+                value={myAttendance.opmerking || ''}
+                onSave={v => saveComment(me.id, v)}
+                onDone={() => {}}
+                placeholder="Opmerking (optioneel)…"
+                rows={1}
+                autoFocus={false}
+              />
+            </div>
           </div>
         )}
 
@@ -605,7 +618,7 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
               <button
                 onClick={onToggleComment}
                 title={a.opmerking ? 'Opmerking bewerken' : 'Opmerking toevoegen'}
-                className="text-rkv-teal/30 hover:text-rkv-teal transition-colors text-[11px] leading-none shrink-0"
+                className="text-rkv-teal/30 hover:text-rkv-teal transition-colors text-sm leading-none shrink-0"
               >
                 ✎
               </button>
@@ -651,8 +664,9 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
 
 // Klein, onopvallend tekstveld voor de opmerking-inline-editor. Slaat op en
 // sluit zichzelf zodra je het veld verlaat (blur) — geen aparte knoppen nodig.
-function InlineCommentEditor({ value, onSave, onDone, placeholder }: {
-  value: string; onSave: (v: string) => void | Promise<void>; onDone: () => void; placeholder?: string
+function InlineCommentEditor({ value, onSave, onDone, placeholder, rows = 2, autoFocus = true }: {
+  value: string; onSave: (v: string) => void | Promise<void>; onDone: () => void
+  placeholder?: string; rows?: number; autoFocus?: boolean
 }) {
   const [text, setText] = useState(value)
 
@@ -663,9 +677,9 @@ function InlineCommentEditor({ value, onSave, onDone, placeholder }: {
 
   return (
     <textarea
-      autoFocus
+      autoFocus={autoFocus}
       className="input resize-none text-xs py-1.5"
-      rows={2}
+      rows={rows}
       maxLength={500}
       placeholder={placeholder}
       value={text}
