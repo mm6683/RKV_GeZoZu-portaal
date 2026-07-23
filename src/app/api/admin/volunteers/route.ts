@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import prisma from '@/lib/db'
+import { enrollVolunteerInExistingEvents } from '@/lib/eventHelpers'
 
 export async function GET() {
   const session = await getSession()
@@ -57,6 +58,17 @@ export async function POST(req: NextRequest) {
       addedById:     session.volunteerId,
     },
   })
+
+  // Meteen als RESERVE toevoegen aan bestaande events waar deze vrijwilliger
+  // voor in aanmerking komt (anders blijft die onzichtbaar op events die al
+  // bestonden vóór het account werd aangemaakt — zie enrollEligibleVolunteers
+  // in eventHelpers.ts, dat enkel de andere richting afhandelt). Non-blocking:
+  // een fout hier mag het aanmaken van het account niet laten mislukken.
+  try {
+    await enrollVolunteerInExistingEvents(volunteer.id)
+  } catch (err) {
+    console.error('enrollVolunteerInExistingEvents mislukt voor', volunteer.id, err)
+  }
 
   const { passwordHash, ...safe } = volunteer
   return NextResponse.json({ volunteer: { ...safe, hasPassword: false }, existed: false }, { status: 201 })

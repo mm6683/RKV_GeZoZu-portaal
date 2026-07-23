@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import prisma from '@/lib/db'
 import { getHighestQual } from '@/lib/ranks'
+import { enrollVolunteerInExistingEvents } from '@/lib/eventHelpers'
 
 export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
   const session = await getSession()
@@ -67,6 +68,16 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       // rankLocked is definitief verwijderd
     },
   })
+
+  // SB/afdeling/blokkering kan net gewijzigd zijn waardoor deze vrijwilliger
+  // nu in aanmerking komt voor bestaande events waar die nog niet op stond
+  // (zie enrollVolunteerInExistingEvents). Non-blocking, zelfde reden als bij
+  // het aanmaken van een nieuw account.
+  try {
+    await enrollVolunteerInExistingEvents(updated.id)
+  } catch (err) {
+    console.error('enrollVolunteerInExistingEvents mislukt voor', updated.id, err)
+  }
 
   // Qualifications aanpassen
   if (body.qualifications) {
