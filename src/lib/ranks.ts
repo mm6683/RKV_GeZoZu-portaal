@@ -39,7 +39,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: null,
     abbreviation: 'LOG',
     color: '#9CA3AF',
-    textColor: '#fff',
+    textColor: '#000000',
     priority: 1,
   },
   EERSTEHULPVERLENER: {
@@ -48,7 +48,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: 'A3',
     abbreviation: 'EHV',
     color: '#FFED00',
-    textColor: '#1A1A1A',
+    textColor: '#000000',
     priority: 2,
   },
   EVENTHULPVERLENER: {
@@ -57,7 +57,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: 'B3',
     abbreviation: 'EVH',
     color: '#F39200',
-    textColor: '#fff',
+    textColor: '#000000',
     priority: 3,
   },
   NDPV_D3: {
@@ -66,7 +66,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: 'D3 - Voorlopig',
     abbreviation: 'NDPV (D3)',
     color: '#9CA6B0',
-    textColor: '#fff',
+    textColor: '#000000',
     priority: 4,
   },
   NDPV: {
@@ -75,7 +75,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: 'D4',
     abbreviation: 'NDPV',
     color: '#6B7280',
-    textColor: '#fff',
+    textColor: '#000000',
     priority: 5,
   },
   DGH: {
@@ -84,7 +84,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: 'G1',
     abbreviation: 'DGH',
     color: '#0F71B8',
-    textColor: '#fff',
+    textColor: '#000000',
     priority: 6,
   },
   VERPLEEGKUNDIGE: {
@@ -93,7 +93,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: 'E1',
     abbreviation: 'VPK',
     color: '#0B8E36',
-    textColor: '#fff',
+    textColor: '#000000',
     priority: 7,
   },
   SPOEDVERPLEEGKUNDIGE: {
@@ -102,7 +102,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: 'E3',
     abbreviation: 'Spoedverpleegkundige',
     color: '#0B8E36',
-    textColor: '#fff',
+    textColor: '#000000',
     priority: 8,
   },
   DOKTER: {
@@ -111,7 +111,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: 'F1',
     abbreviation: 'Arts',
     color: '#E30613',
-    textColor: '#fff',
+    textColor: '#000000',
     priority: 9,
   },
   URGENTIE_ARTS: {
@@ -120,7 +120,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: 'F2',
     abbreviation: 'Urgentie-Arts',
     color: '#E30613',
-    textColor: '#fff',
+    textColor: '#000000',
     priority: 10,
   },
   ADJUNCT: {
@@ -129,7 +129,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: null,
     abbreviation: 'Adjunct',
     color: '#94A3B8',
-    textColor: '#fff',
+    textColor: '#000000',
     priority: 11,
   },
   AFDELINGSVERANTWOORDELIJKE: {
@@ -138,7 +138,7 @@ export const VOLUNTEER_RANKS: Record<VolunteerRank, RankConfig> = {
     code: null,
     abbreviation: 'Afdelingsverantwoordelijke',
     color: '#f3a400',
-    textColor: '#fff',
+    textColor: '#000000',
     priority: 12,
   },
 }
