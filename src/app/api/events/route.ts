@@ -4,6 +4,7 @@ import prisma from '@/lib/db'
 import { z } from 'zod'
 import { enrollEligibleVolunteers } from '@/lib/eventHelpers'
 import { RANK_ORDER } from '@/lib/ranks'
+import type { VolunteerRank } from '@/lib/ranks'
 
 // GET — alle opkomende events (deze maand + alle volgende maanden/jaren).
 // De frontend groepeert dit zelf per maand ("deze maand" + dropdown andere
@@ -40,7 +41,7 @@ export async function GET() {
 
 // Rechtstreeks afgeleid van RANK_ORDER (src/lib/ranks.ts) zodat dit niet
 // kan afwijken van de effectief bestaande SB's/rollen.
-const VALID_RANKS = RANK_ORDER as [string, ...string[]]
+const VALID_RANKS = RANK_ORDER as [VolunteerRank, ...VolunteerRank[]]
 
 const EventSchema = z.object({
   naam: z.string().min(2),
