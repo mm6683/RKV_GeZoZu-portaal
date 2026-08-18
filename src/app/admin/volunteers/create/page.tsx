@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
-import { RANK_ORDER, VOLUNTEER_RANKS } from '@/lib/ranks'
+import { RANK_ORDER, VOLUNTEER_RANKS, getRankLabel } from '@/lib/ranks'
 
 export default function CreateVolunteerPage() {
   const router = useRouter()
@@ -148,7 +148,7 @@ export default function CreateVolunteerPage() {
                     style={{ backgroundColor: cfg.color }}
                   />
                   <span className={`text-sm font-medium ${isSelected ? 'text-rkv-red' : 'text-rkv-teal-dark'}`}>
-                    {cfg.label}
+                    {getRankLabel(rank)}
                   </span>
                   {isSelected && <span className="ml-auto text-rkv-red text-xs">✓</span>}
                 </button>
