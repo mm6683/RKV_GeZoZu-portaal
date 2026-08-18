@@ -1,14 +1,23 @@
 'use client'
-import { getRankConfig } from '@/lib/ranks'
+import { getRankConfig, getRankLabel } from '@/lib/ranks'
 
 interface Props {
   ranks: string | string[] | null | undefined
   size?: 'sm' | 'md' | 'lg'
   className?: string
+  /**
+   * 'full' (default) toont overal de volledige naam + functiecode, bv.
+   * "Eerstehulpverlener (A3)". 'event' toont de korte afkorting zoals
+   * gebruikt op de Event-pagina (bv. "EHV", "Basisvrijwilliger").
+   */
+  variant?: 'full' | 'event'
 }
 
-export default function RankBadge({ ranks, size = 'md', className = '' }: Props) {
-  const list = (Array.isArray(ranks) ? ranks : ranks ? [ranks] : []).filter(Boolean)
+export default function RankBadge({ ranks, size = 'md', className = '', variant = 'full' }: Props) {
+  const list = (Array.isArray(ranks) ? ranks : ranks ? [ranks] : [])
+    .filter(Boolean)
+    .filter(r => variant !== 'event' || getRankConfig(r).abbreviation !== null)
+
   if (list.length === 0) return null
 
   const sizes = {
@@ -27,7 +36,7 @@ export default function RankBadge({ ranks, size = 'md', className = '' }: Props)
             className={`inline-flex items-center rounded-full font-medium ${sizes[size]}`}
             style={{ backgroundColor: cfg.color, color: cfg.textColor }}
           >
-            {cfg.label}
+            {variant === 'event' ? cfg.abbreviation : getRankLabel(r)}
           </span>
         )
       })}

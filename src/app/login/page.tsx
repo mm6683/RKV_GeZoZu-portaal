@@ -76,9 +76,6 @@ export default function LoginPage() {
               ) : 'Inloggen'}
             </button>
           </div>
-          <p className="text-center text-xs text-rkv-teal mt-6">
-            Geen account? Contacteer een admin van GeZoZu.
-          </p>
         </div>
       </div>
     </div>
