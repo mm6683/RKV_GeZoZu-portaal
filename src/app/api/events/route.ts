@@ -3,6 +3,7 @@ import { getSession } from '@/lib/session'
 import prisma from '@/lib/db'
 import { z } from 'zod'
 import { enrollEligibleVolunteers } from '@/lib/eventHelpers'
+import { RANK_ORDER } from '@/lib/ranks'
 
 // GET — alle opkomende events (deze maand + alle volgende maanden/jaren).
 // De frontend groepeert dit zelf per maand ("deze maand" + dropdown andere
@@ -37,10 +38,9 @@ export async function GET() {
   })))
 }
 
-const VALID_RANKS = [
-  'BASISVRIJWILLIGER','NDPV','EERSTEHULPVERLENER','EVENTHULPVERLENER','SPOED','DGH',
-  'VERPLEEGKUNDIGE','DOKTER','ADJUNCT','AFDELINGSVERANTWOORDELIJKE',
-] as const
+// Rechtstreeks afgeleid van RANK_ORDER (src/lib/ranks.ts) zodat dit niet
+// kan afwijken van de effectief bestaande SB's/rollen.
+const VALID_RANKS = RANK_ORDER as [string, ...string[]]
 
 const EventSchema = z.object({
   naam: z.string().min(2),
