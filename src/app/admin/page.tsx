@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
-import { RANK_ORDER, getRankConfig, getRankLabel } from '@/lib/ranks'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -12,7 +11,6 @@ export default function AdminPage() {
   const [volunteers, setVols]     = useState<any[]>([])
   const [search, setSearch]       = useState('')
   const [filter, setFilter]       = useState<'all' | 'gezozu' | 'extern'>('gezozu')
-  const [rankFilter, setRankFilter] = useState<string>('')
   const [loading, setLoading]     = useState(true)
 
   useEffect(() => { load() }, [])
@@ -30,27 +28,13 @@ export default function AdminPage() {
     setLoading(false)
   }
 
-  // Een SB kan gezocht/gefilterd worden op volledige naam, afkorting én
-  // functiecode (bv. "Eerstehulpverlener", "EHV" of "A3" vinden allemaal
-  // dezelfde vrijwilligers).
-  const rankMatchesQuery = (rank: string, query: string) => {
-    const cfg = getRankConfig(rank)
-    return cfg.label.toLowerCase().includes(query)
-      || (cfg.abbreviation?.toLowerCase().includes(query) ?? false)
-      || (cfg.code?.toLowerCase().includes(query) ?? false)
-  }
-
   const filtered = volunteers.filter(v => {
-    const q = search.toLowerCase().trim()
-    const matchSearch = !q
-      || v.volledigeNaam.toLowerCase().includes(q)
+    const matchSearch = v.volledigeNaam.toLowerCase().includes(search.toLowerCase())
       || v.rkvId.includes(search)
-      || (v.ranks ?? []).some((r: string) => rankMatchesQuery(r, q))
     const matchFilter = filter === 'all' ? true
       : filter === 'extern' ? v.isExternal
       : !v.isExternal
-    const matchRank = !rankFilter || (v.ranks ?? []).includes(rankFilter)
-    return matchSearch && matchFilter && matchRank
+    return matchSearch && matchFilter
   })
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">
@@ -88,12 +72,12 @@ export default function AdminPage() {
           <div className="flex gap-3 mb-4">
             <input
               className="input flex-1"
-              placeholder="🔍 Zoek op naam, RKV ID of SB (naam, afkorting of functiecode)…"
+              placeholder="🔍 Zoek op naam of RKV ID…"
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex gap-2">
             {(['all', 'gezozu', 'extern'] as const).map(f => (
               <button
                 key={f}
@@ -105,16 +89,6 @@ export default function AdminPage() {
                 {f === 'all' ? 'Alle' : f === 'gezozu' ? 'GeZoZu' : 'Externen'}
               </button>
             ))}
-            <select
-              className="input !w-auto text-sm py-1.5 ml-auto"
-              value={rankFilter}
-              onChange={e => setRankFilter(e.target.value)}
-            >
-              <option value="">Alle SB&apos;s</option>
-              {RANK_ORDER.map(rank => (
-                <option key={rank} value={rank}>{getRankLabel(rank)}</option>
-              ))}
-            </select>
           </div>
         </div>
 

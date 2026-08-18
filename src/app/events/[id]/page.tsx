@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
 import StatusBadge from '@/components/StatusBadge'
-import { RANK_ORDER, getRankConfig, getRankEventLabel, getHighestRankIndex } from '@/lib/ranks'
+import { RANK_ORDER, getRankConfig, getHighestRankIndex } from '@/lib/ranks'
 import type { AttendStatus } from '@/types'
 
 export default function EventDetailPage() {
@@ -377,7 +377,7 @@ export default function EventDetailPage() {
               color={event.aantalJa >= event.minHulpverleners ? '#8CAA2E' : '#EC2127'} />
             {event.minRank && (
               <InfoRow icon="🎖️" label="Minimum SB"
-                value={getRankEventLabel(event.minRank)}
+                value={getRankConfig(event.minRank).label}
                 color={getRankConfig(event.minRank).color} />
             )}
             {event.afspreekplaats && (
@@ -471,7 +471,7 @@ export default function EventDetailPage() {
                 <p className="text-xs mt-0.5 text-amber-700 dark:text-amber-400">
                   Dit event vereist minimum SB{' '}
                   <strong style={{ color: getRankConfig(event.minRank).color }}>
-                    {getRankEventLabel(event.minRank)}
+                    {getRankConfig(event.minRank).label}
                   </strong>
                   . Je staat niet op de deelnemerslijst en kunt je beschikbaarheid niet invullen.
                 </p>
@@ -591,7 +591,7 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
           {isMe && <span className="text-xs text-rkv-red font-medium">(jij)</span>}
         </div>
         <div className="flex items-center gap-2 mt-0.5">
-          <RankBadge ranks={a.ranks} size="sm" variant="event" />
+          <RankBadge ranks={a.ranks} size="sm" />
           <span className="text-xs text-rkv-teal">{a.hoofdentiteit}</span>
         </div>
 
