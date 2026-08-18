@@ -4,7 +4,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
-import { RANK_ORDER, VOLUNTEER_RANKS, QUAL_BADGES, getRankLabel } from '@/lib/ranks'
+import { RANK_ORDER, VOLUNTEER_RANKS, QUAL_BADGES } from '@/lib/ranks'
 
 const QUAL_TYPES = Object.keys(QUAL_BADGES) as (keyof typeof QUAL_BADGES)[]
 
@@ -157,7 +157,7 @@ export default function AdminVolunteerDetail() {
                 >
                   <div className="w-8 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: cfg.color }} />
                   <span className={`text-sm font-medium ${isSelected ? 'text-rkv-red' : 'text-rkv-teal-dark'}`}>
-                    {getRankLabel(rank)}
+                    {cfg.label}
                   </span>
                   {isSelected && <span className="ml-auto text-rkv-red text-sm">✓</span>}
                 </button>

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
-import { RANK_ORDER, getRankLabel } from '@/lib/ranks'
+import { RANK_ORDER, getRankConfig } from '@/lib/ranks'
 
 export default function CreateEventPage() {
   const router = useRouter()
@@ -146,7 +146,7 @@ export default function CreateEventPage() {
               <option value="">(Geen beperking)</option>
               {RANK_ORDER.map(rank => (
                 <option key={rank} value={rank}>
-                  {getRankLabel(rank)}
+                  {getRankConfig(rank).label}
                 </option>
               ))}
             </select>
