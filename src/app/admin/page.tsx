@@ -110,7 +110,7 @@ export default function AdminPage() {
               value={rankFilter}
               onChange={e => setRankFilter(e.target.value)}
             >
-              <option value="">Alle SB&apos;s</option>
+              <option value="">Alle Sanitaire Bekwaamheden</option>
               {RANK_ORDER.map(rank => (
                 <option key={rank} value={rank}>{getRankLabel(rank)}</option>
               ))}
@@ -123,7 +123,7 @@ export default function AdminPage() {
           {filtered.map(v => (
             <button
               key={v.id}
-              onClick={() => router.push(`/admin/volunteers/${v.id}`)}
+              onClick={() => router.push(`/profile/${v.id}`)}
               className="w-full card hover:shadow-card-hover transition-shadow text-left group"
             >
               <div className="flex items-center gap-3">

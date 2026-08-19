@@ -143,7 +143,7 @@ export default function AdminVolunteerDetail() {
 
         {/* ── SB ───────────────────────────────────────────────── */}
         <div className="card space-y-4">
-          <h2 className="section-title mb-0">SB</h2>
+          <h2 className="section-title mb-0">Sanitaire Bekwaamheden</h2>
           <p className="text-xs text-rkv-teal -mt-3">Selecteer één of meerdere Sanitaire Bekwaamheden.</p>
           <div className="grid grid-cols-2 gap-2">
             {RANK_ORDER.map(rank => {

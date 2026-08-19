@@ -37,9 +37,11 @@ export async function GET(
   const now = new Date()
   // Enkel shifts die al bezig zijn of al voorbij zijn tellen mee, geen
   // toekomstige events waar je je enkel op hebt aangemeld.
-  const shiftenDitJaar = volunteer.attendances.filter(
+  const startedAttendances = volunteer.attendances.filter(
+    a => hasEventStarted(a.event.datum, a.event.beginUur, now)
+  )
+  const shiftenDitJaar = startedAttendances.filter(
     a => new Date(a.event.datum).getFullYear() === now.getFullYear()
-      && hasEventStarted(a.event.datum, a.event.beginUur, now)
   ).length
 
   return NextResponse.json({
@@ -59,7 +61,7 @@ export async function GET(
     totalShiften: volunteer.attendances.length,
     qualifications: volunteer.qualifications,
     functions: volunteer.functions,
-    recentShiften: volunteer.attendances.slice(0, 10).map(a => ({
+    recentShiften: startedAttendances.slice(0, 10).map(a => ({
       eventId: a.event.id,
       naam: a.event.naam,
       datum: a.event.datum,

@@ -128,7 +128,7 @@ export default function CreateVolunteerPage() {
 
         {/* SB */}
         <div className="card space-y-3">
-          <h2 className="section-title mb-0">SB</h2>
+          <h2 className="section-title mb-0">Sanitaire Bekwaamheden</h2>
           <p className="text-xs text-rkv-teal -mt-2">Selecteer één of meerdere Sanitaire Bekwaamheden.</p>
           <div className="grid grid-cols-2 gap-2">
             {RANK_ORDER.map(rank => {
