@@ -27,7 +27,6 @@ export async function GET(
         where: { status: 'JA' },
         include: { event: { select: { id: true, naam: true, datum: true, plaats: true, beginUur: true } } },
         orderBy: { event: { datum: 'desc' } },
-        take: 50,
       },
     },
   })
@@ -58,10 +57,10 @@ export async function GET(
     ranks: volunteer.ranks,
     highestQual: getHighestQual(volunteer.qualifications),
     shiftenDitJaar,
-    totalShiften: volunteer.attendances.length,
+    totalShiften: startedAttendances.length,
     qualifications: volunteer.qualifications,
     functions: volunteer.functions,
-    recentShiften: startedAttendances.slice(0, 10).map(a => ({
+    recentShiften: startedAttendances.map(a => ({
       eventId: a.event.id,
       naam: a.event.naam,
       datum: a.event.datum,

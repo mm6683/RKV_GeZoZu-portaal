@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
+import Collapsible from '@/components/Collapsible'
 import { QUAL_BADGES } from '@/lib/ranks'
 
 export default function ProfilePage() {
@@ -219,34 +220,69 @@ export default function ProfilePage() {
 
         {/* ── Recente shifts ────────────────────────────────────── */}
         {profile.recentShiften.length > 0 && (
-          <div className="card">
-            <h2 className="section-title">Recente shifts</h2>
-            <div className="space-y-1">
-              {profile.recentShiften.map((s: any) => (
-                <button
-                  key={s.eventId}
-                  onClick={() => router.push(`/events/${s.eventId}`)}
-                  className="w-full flex items-center justify-between py-2 px-2 rounded-lg hover:bg-rkv-gray text-left group"
-                >
-                  <div>
-                    <span className="text-sm font-medium text-rkv-teal-dark group-hover:text-rkv-red transition-colors">
-                      {s.naam}
-                    </span>
-                    <p className="text-xs text-rkv-teal">{s.plaats}</p>
+          <Collapsible title="Recente shifts" count={profile.recentShiften.length} defaultOpen>
+            {(() => {
+              const groups = groupShiftsByYearMonth(profile.recentShiften)
+              let lastYearShown: number | null = null
+              return groups.map(g => {
+                const showYearHeader = lastYearShown !== g.year
+                lastYearShown = g.year
+                const monthLabel = new Date(g.year, g.month, 1).toLocaleDateString('nl-BE', { month: 'long' })
+                return (
+                  <div key={`${g.year}-${g.month}`}>
+                    {showYearHeader && (
+                      <div className="text-sm font-bold text-rkv-teal-dark mt-4 mb-2 first:mt-0">{g.year}</div>
+                    )}
+                    <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
+                      {monthLabel}:
+                    </div>
+                    <div className="space-y-1">
+                      {g.shifts.map((s: any) => (
+                        <button
+                          key={s.eventId}
+                          onClick={() => router.push(`/events/${s.eventId}`)}
+                          className="w-full flex items-center justify-between py-2 px-2 rounded-lg hover:bg-rkv-gray text-left group"
+                        >
+                          <div>
+                            <span className="text-sm font-medium text-rkv-teal-dark group-hover:text-rkv-red transition-colors">
+                              {s.naam}
+                            </span>
+                            <p className="text-xs text-rkv-teal">{s.plaats}</p>
+                          </div>
+                          <span className="text-xs text-rkv-teal flex-shrink-0">
+                            {new Date(s.datum).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <span className="text-xs text-rkv-teal flex-shrink-0">
-                    {new Date(s.datum).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
+                )
+              })
+            })()}
+          </Collapsible>
         )}
 
         {/* Sync info (admin) */}
       </div>
     </div>
   )
+}
+
+// Groepeert shifts per jaar + maand, in omgekeerde chronologische volgorde
+// (nieuwste eerst) — zelfde weergave als "Opkomende maanden" op het
+// dashboard. De input (profile.recentShiften) komt al gesorteerd op datum
+// (aflopend) uit de API, dus de Map-insertievolgorde is voldoende om de
+// groepen zelf ook aflopend te houden.
+function groupShiftsByYearMonth(shifts: any[]) {
+  const map = new Map<string, { year: number; month: number; shifts: any[] }>()
+  for (const s of shifts) {
+    const d = new Date(s.datum)
+    const year = d.getFullYear(), month = d.getMonth()
+    const key = `${year}-${month}`
+    if (!map.has(key)) map.set(key, { year, month, shifts: [] })
+    map.get(key)!.shifts.push(s)
+  }
+  return Array.from(map.values())
 }
 
 function ContactRow({ icon, label, value }: { icon: string; label: string; value: string }) {
