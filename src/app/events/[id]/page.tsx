@@ -569,6 +569,8 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
   disabled: boolean; onStatusChange: (s: AttendStatus) => void; onRemove?: () => void
   commentOpen?: boolean; onToggleComment?: () => void; onSaveComment?: (v: string) => void | Promise<void>
 }) {
+  const router = useRouter()
+
   const STATUS_BTNS: { status: AttendStatus; label: string; activeColor: string }[] = [
     { status: 'JA',            label: '✓', activeColor: '#8CAA2E' },
     { status: 'ONBESCHIKBAAR', label: '✗', activeColor: '#EC2127' },
@@ -585,9 +587,21 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
       <VolunteerAvatar pfpUrl={a.pfpUrl} naam={a.volledigeNaam} size={36} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
-          <span className="text-sm font-semibold text-rkv-teal-dark truncate">
-            {a.displayName || a.volledigeNaam}
-          </span>
+          {isAdmin ? (
+            // Klikbare naam voor admins — gaat naar het profiel van de
+            // vrijwilliger, net zoals bv. de rijen in het admin-paneel.
+            <button
+              onClick={() => router.push(`/profile/${a.volunteerId}`)}
+              title="Profiel bekijken"
+              className="text-sm font-semibold text-rkv-teal-dark truncate text-left hover:text-rkv-red hover:underline transition-colors"
+            >
+              {a.displayName || a.volledigeNaam}
+            </button>
+          ) : (
+            <span className="text-sm font-semibold text-rkv-teal-dark truncate">
+              {a.displayName || a.volledigeNaam}
+            </span>
+          )}
           {isMe && <span className="text-xs text-rkv-red font-medium">(jij)</span>}
         </div>
         <div className="flex items-center gap-2 mt-0.5">

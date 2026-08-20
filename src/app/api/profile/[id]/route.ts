@@ -43,6 +43,13 @@ export async function GET(
     a => new Date(a.event.datum).getFullYear() === now.getFullYear()
   ).length
 
+  // Toekomstige shifts waar de vrijwilliger als aanwezig (JA) staat ingepland,
+  // oplopend gesorteerd (eerstvolgende bovenaan) — het omgekeerde van
+  // recentShiften hierboven.
+  const upcomingAttendances = volunteer.attendances
+    .filter(a => !hasEventStarted(a.event.datum, a.event.beginUur, now))
+    .sort((a, b) => new Date(a.event.datum).getTime() - new Date(b.event.datum).getTime())
+
   return NextResponse.json({
     id: volunteer.id,
     rkvId: volunteer.rkvId,
@@ -61,6 +68,12 @@ export async function GET(
     qualifications: volunteer.qualifications,
     functions: volunteer.functions,
     recentShiften: startedAttendances.map(a => ({
+      eventId: a.event.id,
+      naam: a.event.naam,
+      datum: a.event.datum,
+      plaats: a.event.plaats,
+    })),
+    upcomingShiften: upcomingAttendances.map(a => ({
       eventId: a.event.id,
       naam: a.event.naam,
       datum: a.event.datum,
