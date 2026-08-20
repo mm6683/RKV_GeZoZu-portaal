@@ -1,7 +1,30 @@
 # GeZoZu Vrijwilligersportaal
 
-Onofficieel shift management portaal voor vrijwilligers van  
-**Rode Kruis Vlaanderen — afdeling Genk-Zonhoven-Zutendaal**
+Onofficieel shift management portaal voor vrijwilligers van
+**Rode Kruis Vlaanderen — afdeling Genk-Zonhoven-Zutendaal (GeZoZu)**
+
+Vrijwilligers zien welke events/shiften er aankomen, duiden hun
+beschikbaarheid aan (JA / ONBESCHIKBAAR) en zien wie er nog meer op een
+event staat. Admins maken events aan, beheren vrijwilligers en rangen, en
+houden een archief bij van voorbije en geannuleerde events.
+
+---
+
+## ⚠️ Belangrijke wijziging: RKV-sync is uitgeschakeld
+
+Eerdere versies van dit project logden in via een echt RKV-account
+(Playwright-scraping van mijn.rodekruis.be) en synchroniseerden profiel,
+kwalificaties en functies automatisch. **Dat is nu uitgeschakeld** —
+`src/lib/scraper.ts` bestaat nog enkel als lege placeholder. Concreet:
+
+- Login gebeurt via een **eigen account** (e-mailadres, RKV ID, of
+  `voornaam.achternaam`-notatie + wachtwoord), niet meer via RKV zelf.
+- Profielfoto, kwalificaties en functies worden **niet meer automatisch**
+  bijgewerkt — kwalificaties beheer je nu manueel per vrijwilliger via het
+  admin-paneel.
+- Het `RkvFunction`-model (functies/rollen bij RKV) staat nog in het schema
+  en wordt getoond waar er data voor is, maar nergens in de huidige app
+  wordt er nog een nieuwe rij voor aangemaakt.
 
 ---
 
@@ -10,45 +33,70 @@ Onofficieel shift management portaal voor vrijwilligers van
 | Laag | Technologie |
 |---|---|
 | Frontend & Backend | Next.js 14 (App Router) |
-| Database | PostgreSQL via Prisma |
-| Auth | iron-session (eigen sessies) |
-| RKV Login | Playwright + Stealth Plugin |
-| Styling | Tailwind CSS — RKV huisstijl |
-| Hosting | Cloudflare Pages |
+| Taal | TypeScript |
+| Database | PostgreSQL via Prisma ORM |
+| Auth | Eigen account + wachtwoord (bcrypt-hash), sessies via iron-session |
+| Validatie | Zod |
+| Styling | Tailwind CSS — RKV huisstijl, met dark mode |
+| Hosting | Cloudflare Pages (of vergelijkbaar) |
 | DB hosting | Neon / Supabase / Railway |
 
 ---
 
-## Rangensysteem (laag → hoog)
+## Rangensysteem (SB — Sanitaire Bekwaamheid)
 
-| Rang | Kleur |
-|---|---|
-| Basisvrijwilliger | Grijs |
-| Eerstehulpverlener | Geel |
-| Eventhulpverlener | Oranje |
-| DGH | Blauw |
-| Verpleegkundige | Groen |
-| Dokter | Rood |
-| Adjunct | Zilver |
-| Afdelingsverantwoordelijke | Goud |
+Een vrijwilliger kan **meerdere SB's tegelijk** hebben. Rangen worden
+handmatig toegewezen door admins.
 
-Rangen worden handmatig toegewezen door admins. Toekomstige import via RKV functies is voorzien.
+| SB | Code | Afkorting | Kleur |
+|---|---|---|---|
+| Polyvalente Basisvrijwilliger | — | LOG | Grijs |
+| Eerstehulpverlener | A3 | EHV | Geel |
+| Eventhulpverlener | B3 | EVH | Oranje |
+| Ambulancier NDPV (voorlopig) | D3 | NDPV (D3) | Grijsblauw |
+| Ambulancier NDPV | D4 | NDPV | Grijs |
+| Dringende geneeskundige hulpverlener | G1 | DGH | Blauw |
+| Verpleegkundige | E1 | VPK | Groen |
+| Spoedverpleegkundige | E3 | Spoedverpleegkundige | Groen |
+| Arts | F1 | Arts | Rood |
+| Urgentie-arts | F2 | Urgentie-Arts | Rood |
+| Adjunct | — | Adjunct | Blauwgrijs |
+| Afdelingsverantwoordelijke | — | Afdelingsverantwoordelijke | Goud |
+
+Daarnaast bestaan er **kwalificatiebadges**, los van de SB, ook manueel
+beheerd door admins sinds de RKV-sync uit staat:
+
+`Ereteken` · `Medisch Diploma` · `Kwalificatie` · `Brevet` · `Attest`
 
 ---
 
 ## Features
 
-- ✅ Login via officieel RKV-account (Playwright scraping)
-- ✅ Automatische profielsync bij login (naam, kwalificaties, functies)
-- ✅ Profielfoto en displaynaam van mijn.rodekruis.be
-- ✅ Rangensysteem met kleurcodering
-- ✅ Events aanmaken, bewerken, archiveren (admins)
-- ✅ Beschikbaarheid per event (JA / BLANCO / ONBESCHIKBAAR)
-- ✅ Lijst- en kalenderweergave van events
-- ✅ Pickup locatie op kaart (Google Maps embed)
-- ✅ Externe vrijwilligers toevoegen via RKV ID
-- ✅ Admin-vergrendelde velden (niet overschrijfbaar door sync)
-- ✅ Profielpagina: eigen voor iedereen, andermans alleen voor admins
+- ✅ Login via eigen account: e-mailadres, `voornaam.achternaam`-notatie of
+  RKV ID — wachtwoord instellen bij eerste login
+- ✅ Wachtwoord wijzigen (zelf) en resetten (admin, voor andere vrijwilligers)
+- ✅ Rangensysteem (SB) met kleurcodering + kwalificatiebadges
+- ✅ Events aanmaken, bewerken, annuleren en archiveren (admin)
+- ✅ Event herhalen/dupliceren naar een nieuwe datum — ook meerdaagse events
+  (admin)
+- ✅ Automatische inschrijving als RESERVE van alle in aanmerking komende
+  GeZoZu-vrijwilligers bij een nieuw/herhaald event, én omgekeerd bij een
+  nieuwe of gewijzigde vrijwilliger (zodat niemand onzichtbaar blijft op
+  bestaande events)
+- ✅ Beschikbaarheid per event: RESERVE / JA / ONBESCHIKBAAR, met een privé
+  opmerking per vrijwilliger (enkel zichtbaar voor zichzelf en admins)
+- ✅ Lijst- en kalenderweergave (per maand) van aankomende events op het
+  dashboard
+- ✅ Pickup-locatie op kaart (Google Maps embed)
+- ✅ Externe vrijwilligers toevoegen via RKV ID, filterbaar in de
+  vrijwilligerslijst
+- ✅ Profielpagina — eigen voor iedereen, andermans enkel voor admins — met
+  shift-historiek en aantal shiften dit jaar
+- ✅ Admin-paneel: zoeken/filteren op naam, RKV ID of SB; rangen toewijzen;
+  blokkeren; admin-rechten toekennen (pas mogelijk nadat de gebruiker zelf
+  een wachtwoord heeft ingesteld)
+- ✅ Archief: voorbije en geannuleerde events, gegroepeerd per jaar
+- ✅ Dark mode
 
 ---
 
@@ -56,16 +104,15 @@ Rangen worden handmatig toegewezen door admins. Toekomstige import via RKV funct
 
 ### 1. Vereisten
 
-- Node.js 20+
-- PostgreSQL database (lokaal of Neon/Supabase gratis tier)
+- Node.js 20+ (CI draait op 22)
+- PostgreSQL database (lokaal, of gratis tier op Neon/Supabase/Railway)
 
 ### 2. Installeren
 
 ```bash
-git clone https://github.com/jouw-username/gezozu-portaal
-cd gezozu-portaal
+git clone https://github.com/mm6683/RKV_GeZoZu-portaal.git
+cd RKV_GeZoZu-portaal
 npm install
-npx playwright install chromium
 ```
 
 ### 3. Omgevingsvariabelen
@@ -73,15 +120,42 @@ npx playwright install chromium
 ```bash
 cp .env.example .env
 # Pas DATABASE_URL en SESSION_SECRET aan
+# SESSION_SECRET: minimaal 32 tekens, genereer met `openssl rand -base64 32`
 ```
 
 ### 4. Database opzetten
 
 ```bash
-npm run db:push   # schema aanmaken
+npm run db:push   # schema naar de database pushen
 ```
 
-### 5. Starten
+### 5. Eerste admin aanmaken
+
+Er is geen registratiepagina en geen RKV-login meer om een eerste account
+mee te bootstrappen — nieuwe vrijwilligers worden normaal via het
+admin-paneel aangemaakt, maar dat vereist zelf al een admin-account. Voor
+de allereerste gebruiker moet je dus rechtstreeks in de database werken:
+
+```bash
+npm run db:studio   # opent Prisma Studio in de browser
+```
+
+Maak in de `Volunteer`-tabel manueel een rij aan met minstens:
+
+- `rkvId` — iets uniek (bv. je eigen RKV-ID, of `LOCAL-1`)
+- `voornaam`, `naam`, `volledigeNaam`
+- `hoofdentiteit` — bv. `GENK-ZONHOVEN-ZUTENDAAL`
+- `emailWerk` — het adres waarmee je wil inloggen
+- `isAdmin` — `true`
+
+Log daarna in op `/login` met dat e-mailadres. Omdat er nog geen
+`passwordHash` staat, kom je automatisch in de flow voor het instellen van
+een eerste wachtwoord (`/set-password`) terecht. Zodra dat wachtwoord
+ingesteld is, ben je volwaardig ingelogd als admin en kan je vanaf dan
+gewoon via het admin-paneel verder werken — Prisma Studio is dan niet meer
+nodig.
+
+### 6. Starten
 
 ```bash
 npm run dev       # http://localhost:3000
@@ -89,97 +163,125 @@ npm run dev       # http://localhost:3000
 
 ---
 
-## Deployment (Cloudflare Pages + GitHub)
+## Deployment
 
-### Stap 1 — Database
+### Database
 
-Maak een gratis PostgreSQL database aan op [neon.tech](https://neon.tech) of [supabase.com](https://supabase.com).  
-Kopieer de connectie string.
+Zet een PostgreSQL database op (bv. gratis tier op
+[neon.tech](https://neon.tech), [supabase.com](https://supabase.com) of
+[railway.app](https://railway.app)) en kopieer de connectiestring.
 
-### Stap 2 — GitHub
+### Hosting (Cloudflare Pages)
 
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/jouw-username/gezozu-portaal
-git push -u origin main
-```
-
-### Stap 3 — Cloudflare Pages
-
-1. Ga naar [dash.cloudflare.com](https://dash.cloudflare.com) → Pages → Create project
-2. Verbind je GitHub repo
-3. Build settings:
+1. Ga naar [dash.cloudflare.com](https://dash.cloudflare.com) → Pages →
+   Create project, en verbind je GitHub repo.
+2. Build settings:
    - **Framework**: Next.js
    - **Build command**: `npm run build`
    - **Output directory**: `.next`
-4. Environment variables toevoegen:
-   - `DATABASE_URL` — je Neon/Supabase connectie string
-   - `SESSION_SECRET` — willekeurige string van 32+ tekens
+3. Environment variables instellen **in het Cloudflare Pages
+   project zelf** (Settings → Environment variables) — dit staat los van
+   GitHub Secrets hieronder:
+   - `DATABASE_URL`
+   - `SESSION_SECRET`
    - `NODE_ENV` — `production`
 
-### Stap 4 — GitHub Secrets (voor CI/CD)
+### GitHub Actions — automatische DB-migraties
 
-Ga naar GitHub repo → Settings → Secrets → Actions:
+`.github/workflows/deploy.yml` draait bij elke push naar `main` en pusht
+het Prisma-schema automatisch naar de productiedatabase (`prisma db push
+--accept-data-loss`). Dit vereist één GitHub Secret (Settings → Secrets →
+Actions):
 
 | Secret | Waarde |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connectie string |
-| `SESSION_SECRET` | Geheime string 32+ tekens |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare API token |
-| `CLOUDFLARE_ACCOUNT_ID` | Jouw Cloudflare account ID |
+| `DATABASE_URL` | Dezelfde PostgreSQL connectiestring als hierboven |
 
-### Stap 5 — Eerste admin aanmaken
+Let op: deze workflow deployt de app zelf **niet** — dat doet Cloudflare
+Pages via zijn eigen Git-integratie, los van GitHub Actions. De workflow
+zorgt enkel dat het databaseschema bij elke push mee gesynchroniseerd
+blijft.
 
-Na de eerste deployment, log in met je eigen RKV-account.  
-Stel jezelf daarna manueel in als admin via de database:
+⚠️ Omdat `--accept-data-loss` gebruikt wordt: een destructieve
+schema-wijziging (bv. een enum-waarde verwijderen die nog ergens in gebruik
+is) kan data laten vallen of de push laten falen. Zie
+`scripts/migrate-spoed-rank.ts` voor een voorbeeld van hoe zo'n wijziging
+eerst veilig voor te bereiden vóór je ze naar `main` merget.
 
-```sql
-UPDATE "Volunteer"
-SET "isAdmin" = true
-WHERE "rkvId" = 'JOUW_RKV_ID';
+---
+
+## Scripts
+
+| Commando | Omschrijving |
+|---|---|
+| `npm run dev` | Lokale development server |
+| `npm run build` | Prisma client genereren + production build |
+| `npm run start` | Production server starten |
+| `npm run db:push` | Prisma schema naar de database pushen |
+| `npm run db:studio` | Prisma Studio openen (GUI voor de database) |
+
+> `npm run db:seed` staat nog wel in `package.json`, maar `prisma/seed.ts`
+> bestaat niet meer in deze repo — dat commando faalt tot het bestand
+> terugkomt of de referentie eruit gehaald wordt.
+
+Daarnaast staan er in `scripts/` twee eenmalige, idempotente
+migratie/backfill-scripts (elk met een `--dry-run` optie en uitgebreide
+uitleg in een comment bovenaan het bestand):
+
+- **`backfill-attendees.ts`** — vult ontbrekende RESERVE-rijen aan voor
+  vrijwilligers die na het aanmaken van een event zijn toegevoegd.
+- **`migrate-spoed-rank.ts`** — migreert de verwijderde SB "Spoed" naar
+  `SPOEDVERPLEEGKUNDIGE`, nodig vóór je die enum-waarde uit het schema
+  haalt.
+
+Draai ze enkel als je weet dat je ze nodig hebt, bv.:
+
+```bash
+DATABASE_URL="postgresql://..." npx tsx scripts/backfill-attendees.ts --dry-run
 ```
-
-Dit kan via de Neon/Supabase SQL editor.
 
 ---
 
 ## Projectstructuur
 
 ```
-gezozu-portaal/
+RKV_GeZoZu-portaal/
 ├── prisma/
-│   └── schema.prisma          ← Database schema
+│   └── schema.prisma           ← Database schema
+├── scripts/
+│   ├── backfill-attendees.ts   ← Eenmalig: zie "Scripts" hierboven
+│   └── migrate-spoed-rank.ts   ← Eenmalig: zie "Scripts" hierboven
 ├── src/
 │   ├── app/
 │   │   ├── api/
-│   │   │   ├── auth/          ← Login, logout
-│   │   │   ├── events/        ← CRUD events + beschikbaarheid
-│   │   │   ├── me/            ← Eigen profiel
-│   │   │   ├── profile/       ← Profiel (eigen of admin)
-│   │   │   └── admin/         ← Admin endpoints
-│   │   ├── dashboard/         ← Homepagina
-│   │   ├── events/[id]/       ← Event detail
-│   │   ├── profile/[id]/      ← Profielpagina
-│   │   ├── login/             ← Loginpagina
-│   │   └── admin/             ← Admin paneel
-│   ├── components/            ← Herbruikbare UI componenten
+│   │   │   ├── auth/           ← login, logout, set-password, change-password
+│   │   │   ├── events/         ← CRUD + beschikbaarheid + herhalen/annuleren
+│   │   │   ├── me/             ← eigen (compact) profiel, o.a. voor navbar
+│   │   │   ├── profile/[id]/   ← profiel (eigen of admin) + shift-historiek
+│   │   │   └── admin/          ← vrijwilligersbeheer + archief
+│   │   ├── dashboard/          ← homepagina (lijst-/kalenderweergave)
+│   │   ├── events/[id]/        ← event-detail + beschikbaarheid aanduiden
+│   │   ├── profile/[id]/       ← profielpagina
+│   │   ├── login/, set-password/  ← inloggen + eerste wachtwoord instellen
+│   │   └── admin/              ← admin-paneel (vrijwilligers, events, externen, archief)
+│   ├── components/             ← herbruikbare UI-componenten (o.a. ThemeToggle, RankBadge)
 │   └── lib/
-│       ├── db.ts              ← Prisma singleton
-│       ├── ranks.ts           ← Rang + kwalificatie definities
-│       ├── scraper.ts         ← Playwright RKV login
-│       └── session.ts         ← iron-session config
+│       ├── db.ts               ← Prisma singleton
+│       ├── ranks.ts            ← SB + kwalificatiebadge definities
+│       ├── eventHelpers.ts     ← auto-enrollment + "is dit shift al bezig?"-logica
+│       ├── session.ts          ← iron-session config
+│       └── scraper.ts          ← uitgeschakeld, enkel placeholder (zie hierboven)
 ├── .env.example
-└── .github/workflows/deploy.yml
+└── .github/workflows/deploy.yml   ← pusht het Prisma-schema bij elke push naar main
 ```
 
 ---
 
-## Toekomstige features
+## Mogelijke volgende stappen
 
-- [ ] Automatische rang toewijzing via RKV functies import
-- [ ] Officiële OIDC integratie (als RKV IT toestemming geeft)
+- [ ] RKV-sync opnieuw activeren of vervangen door een officiële
+      RKV-integratie (de huidige scraping-aanpak staat volledig uit, zie
+      bovenaan)
 - [ ] Push notificaties voor nieuwe events
 - [ ] Exporteren van aanwezigheidslijsten
 - [ ] Statistieken dashboard voor admins
