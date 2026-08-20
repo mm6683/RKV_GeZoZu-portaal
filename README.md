@@ -38,7 +38,7 @@ kwalificaties en functies automatisch. **Dat is nu uitgeschakeld** —
 | Auth | Eigen account + wachtwoord (bcrypt-hash), sessies via iron-session |
 | Validatie | Zod |
 | Styling | Tailwind CSS — RKV huisstijl, met dark mode |
-| Hosting | Cloudflare Pages (of vergelijkbaar) |
+| Hosting | Vercel |
 | DB hosting | Neon / Supabase / Railway |
 
 ---
@@ -171,17 +171,14 @@ Zet een PostgreSQL database op (bv. gratis tier op
 [neon.tech](https://neon.tech), [supabase.com](https://supabase.com) of
 [railway.app](https://railway.app)) en kopieer de connectiestring.
 
-### Hosting (Cloudflare Pages)
+### Hosting (Vercel)
 
-1. Ga naar [dash.cloudflare.com](https://dash.cloudflare.com) → Pages →
-   Create project, en verbind je GitHub repo.
-2. Build settings:
-   - **Framework**: Next.js
-   - **Build command**: `npm run build`
-   - **Output directory**: `.next`
-3. Environment variables instellen **in het Cloudflare Pages
-   project zelf** (Settings → Environment variables) — dit staat los van
-   GitHub Secrets hieronder:
+1. Ga naar [vercel.com](https://vercel.com) → New Project, en verbind je
+   GitHub repo. Vercel herkent Next.js automatisch — build command en
+   output directory hoef je niet manueel in te stellen.
+2. Environment variables instellen **in het Vercel project zelf**
+   (Settings → Environment Variables) — dit staat los van GitHub Secrets
+   hieronder:
    - `DATABASE_URL`
    - `SESSION_SECRET`
    - `NODE_ENV` — `production`
@@ -197,10 +194,9 @@ Actions):
 |---|---|
 | `DATABASE_URL` | Dezelfde PostgreSQL connectiestring als hierboven |
 
-Let op: deze workflow deployt de app zelf **niet** — dat doet Cloudflare
-Pages via zijn eigen Git-integratie, los van GitHub Actions. De workflow
-zorgt enkel dat het databaseschema bij elke push mee gesynchroniseerd
-blijft.
+Let op: deze workflow deployt de app zelf **niet** — dat doet Vercel via
+zijn eigen Git-integratie, los van GitHub Actions. De workflow zorgt enkel
+dat het databaseschema bij elke push mee gesynchroniseerd blijft.
 
 ⚠️ Omdat `--accept-data-loss` gebruikt wordt: een destructieve
 schema-wijziging (bv. een enum-waarde verwijderen die nog ergens in gebruik
