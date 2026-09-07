@@ -19,7 +19,7 @@ export async function GET() {
         attendances: {
           where: {
             status: 'JA',
-            event: { datum: { gte: new Date(new Date().getFullYear(), 0, 1) } },
+            event: { datum: { gte: new Date(new Date().getFullYear(), 0, 1) }, isCancelled: false },
           },
           include: { event: { select: { datum: true, beginUur: true } } },
         },

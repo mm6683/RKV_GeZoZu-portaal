@@ -24,7 +24,7 @@ export async function GET(
       qualifications: { orderBy: { type: 'asc' } },
       functions: { where: { status: { not: 'Inactief' } }, orderBy: { startdatum: 'desc' } },
       attendances: {
-        where: { status: 'JA' },
+        where: { status: 'JA', event: { isCancelled: false } },
         include: { event: { select: { id: true, naam: true, datum: true, plaats: true, beginUur: true } } },
         orderBy: { event: { datum: 'desc' } },
       },
