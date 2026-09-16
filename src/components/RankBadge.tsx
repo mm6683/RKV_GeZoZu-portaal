@@ -33,7 +33,7 @@ export default function RankBadge({ ranks, size = 'md', className = '', variant 
         return (
           <span
             key={r}
-            className={`inline-flex items-center rounded-full font-medium ${sizes[size]}`}
+            className={`inline-flex items-center justify-center text-center rounded-xl font-medium leading-tight ${sizes[size]}`}
             style={{ backgroundColor: cfg.color, color: cfg.textColor }}
           >
             {variant === 'event' ? cfg.abbreviation : getRankLabel(r)}

@@ -139,13 +139,13 @@ export default function AdminPage() {
                     {v.isExternal && <span className="badge bg-[#81A6AB] text-white text-xs">Extern</span>}
                     {v.isBlocked && <span className="badge bg-gray-400 text-white text-xs">Geblokkeerd</span>}
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5">
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                     <span className="text-xs text-rkv-teal">{v.rkvId}</span>
-                    <span className="text-rkv-teal-dark/30">·</span>
+                    <span className="text-rkv-teal-dark/30 hidden sm:inline">·</span>
                     <span className="text-xs text-rkv-teal">{v.hoofdentiteit}</span>
                     {v.ranks?.length > 0 && (
                       <>
-                        <span className="text-rkv-teal-dark/30">·</span>
+                        <span className="text-rkv-teal-dark/30 hidden sm:inline">·</span>
                         <RankBadge ranks={v.ranks} size="sm" />
                       </>
                     )}
