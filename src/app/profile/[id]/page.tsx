@@ -6,6 +6,7 @@ import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
 import Collapsible from '@/components/Collapsible'
 import { QUAL_BADGES } from '@/lib/ranks'
+import { useGridLayout } from '@/hooks/useGridLayout'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -14,6 +15,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [notAllowed, setNotAllowed] = useState(false)
+  const isGrid = useGridLayout()
 
   useEffect(() => {
     async function load() {
@@ -71,7 +73,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-rkv-gray">
       <Navbar naam={me.volledigeNaam} id={me.id} displayName={me.displayName} voornaam={me.voornaam} pfpUrl={me.pfpUrl} isAdmin={me.isAdmin} />
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+      <div className={`mx-auto px-4 py-6 space-y-5 transition-all duration-300 ${isGrid ? 'max-w-[1800px]' : 'max-w-2xl'}`}>
         {/* Terug */}
         <button
           onClick={() => router.back()}
@@ -153,9 +155,9 @@ export default function ProfilePage() {
                     >
                       {cfg.label}
                     </div>
-                    <div className="space-y-1.5">
+                    <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-1.5'}>
                       {items.map((q: any) => (
-                        <div key={q.id} className="flex items-center justify-between bg-rkv-gray rounded-lg px-3 py-2">
+                        <div key={q.id} className="flex items-center justify-between bg-rkv-gray rounded-lg px-3 py-2 h-full">
                           <span className="text-sm text-rkv-teal-dark font-medium">{q.naam}</span>
                           {q.geldigTot && (
                             <span className="text-xs text-rkv-teal">geldig tot {q.geldigTot}</span>
@@ -177,9 +179,9 @@ export default function ProfilePage() {
         {profile.functions.length > 0 && (
           <div className="card">
             <h2 className="section-title">RKV Functies</h2>
-            <div className="space-y-2">
+            <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
               {profile.functions.map((f: any) => (
-                <div key={f.id} className="bg-rkv-gray rounded-lg px-3 py-2.5">
+                <div key={f.id} className="bg-rkv-gray rounded-lg px-3 py-2.5 h-full">
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="text-sm font-semibold text-rkv-teal-dark">{f.functie}</p>
@@ -210,7 +212,7 @@ export default function ProfilePage() {
         {(isOwnProfile || me.isAdmin) && (
           <div className="card">
             <h2 className="section-title">Contactinfo</h2>
-            <div className="space-y-2">
+            <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
               {profile.emailWerk && <ContactRow icon="✉️" label="E-mail werk" value={profile.emailWerk} />}
               {profile.gsm && <ContactRow icon="📱" label="GSM" value={profile.gsm} />}
               {profile.rkvId && <ContactRow icon="🪪" label="RKV ID" value={profile.rkvId} />}
@@ -224,88 +226,92 @@ export default function ProfilePage() {
             het omgekeerde van "Recente shifts" hieronder. */}
         {profile.upcomingShiften.length > 0 && (
           <Collapsible title="Opkomende Shifts" count={profile.upcomingShiften.length} defaultOpen>
-            {(() => {
-              const groups = groupShiftsByYearMonth(profile.upcomingShiften)
-              let lastYearShown: number | null = null
-              return groups.map(g => {
-                const showYearHeader = lastYearShown !== g.year
-                lastYearShown = g.year
-                const monthLabel = new Date(g.year, g.month, 1).toLocaleDateString('nl-BE', { month: 'long' })
-                return (
-                  <div key={`${g.year}-${g.month}`}>
-                    {showYearHeader && (
-                      <div className="text-sm font-bold text-rkv-teal-dark mt-4 mb-2 first:mt-0">{g.year}</div>
-                    )}
-                    <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
-                      {monthLabel}:
-                    </div>
-                    <div className="space-y-1">
-                      {g.shifts.map((s: any) => (
-                        <button
-                          key={s.eventId}
-                          onClick={() => router.push(`/events/${s.eventId}`)}
-                          className="w-full flex items-center justify-between py-2 px-2 rounded-lg hover:bg-rkv-gray text-left group"
-                        >
-                          <div>
-                            <span className="text-sm font-medium text-rkv-teal-dark group-hover:text-rkv-red transition-colors">
-                              {s.naam}
+            <div className="space-y-4">
+              {(() => {
+                const groups = groupShiftsByYearMonth(profile.upcomingShiften)
+                let lastYearShown: number | null = null
+                return groups.map(g => {
+                  const showYearHeader = lastYearShown !== g.year
+                  lastYearShown = g.year
+                  const monthLabel = new Date(g.year, g.month, 1).toLocaleDateString('nl-BE', { month: 'long' })
+                  return (
+                    <div key={`${g.year}-${g.month}`}>
+                      {showYearHeader && (
+                        <div className="text-sm font-bold text-rkv-teal-dark mt-4 mb-2 first:mt-0">{g.year}</div>
+                      )}
+                      <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
+                        {monthLabel}:
+                      </div>
+                      <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-1'}>
+                        {g.shifts.map((s: any) => (
+                          <button
+                            key={s.eventId}
+                            onClick={() => router.push(`/events/${s.eventId}`)}
+                            className="w-full flex items-center justify-between py-2 px-2 rounded-lg hover:bg-rkv-gray text-left group h-full"
+                          >
+                            <div>
+                              <span className="text-sm font-medium text-rkv-teal-dark group-hover:text-rkv-red transition-colors">
+                                {s.naam}
+                              </span>
+                              <p className="text-xs text-rkv-teal">{s.plaats}</p>
+                            </div>
+                            <span className="text-xs text-rkv-teal flex-shrink-0 ml-2">
+                              {new Date(s.datum).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </span>
-                            <p className="text-xs text-rkv-teal">{s.plaats}</p>
-                          </div>
-                          <span className="text-xs text-rkv-teal flex-shrink-0">
-                            {new Date(s.datum).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </span>
-                        </button>
-                      ))}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )
-              })
-            })()}
+                  )
+                })
+              })()}
+            </div>
           </Collapsible>
         )}
 
         {/* ── Recente shifts ────────────────────────────────────── */}
         {profile.recentShiften.length > 0 && (
           <Collapsible title="Recente shifts" count={profile.recentShiften.length}>
-            {(() => {
-              const groups = groupShiftsByYearMonth(profile.recentShiften)
-              let lastYearShown: number | null = null
-              return groups.map(g => {
-                const showYearHeader = lastYearShown !== g.year
-                lastYearShown = g.year
-                const monthLabel = new Date(g.year, g.month, 1).toLocaleDateString('nl-BE', { month: 'long' })
-                return (
-                  <div key={`${g.year}-${g.month}`}>
-                    {showYearHeader && (
-                      <div className="text-sm font-bold text-rkv-teal-dark mt-4 mb-2 first:mt-0">{g.year}</div>
-                    )}
-                    <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
-                      {monthLabel}:
-                    </div>
-                    <div className="space-y-1">
-                      {g.shifts.map((s: any) => (
-                        <button
-                          key={s.eventId}
-                          onClick={() => router.push(`/events/${s.eventId}`)}
-                          className="w-full flex items-center justify-between py-2 px-2 rounded-lg hover:bg-rkv-gray text-left group"
-                        >
-                          <div>
-                            <span className="text-sm font-medium text-rkv-teal-dark group-hover:text-rkv-red transition-colors">
-                              {s.naam}
+            <div className="space-y-4">
+              {(() => {
+                const groups = groupShiftsByYearMonth(profile.recentShiften)
+                let lastYearShown: number | null = null
+                return groups.map(g => {
+                  const showYearHeader = lastYearShown !== g.year
+                  lastYearShown = g.year
+                  const monthLabel = new Date(g.year, g.month, 1).toLocaleDateString('nl-BE', { month: 'long' })
+                  return (
+                    <div key={`${g.year}-${g.month}`}>
+                      {showYearHeader && (
+                        <div className="text-sm font-bold text-rkv-teal-dark mt-4 mb-2 first:mt-0">{g.year}</div>
+                      )}
+                      <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
+                        {monthLabel}:
+                      </div>
+                      <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-1'}>
+                        {g.shifts.map((s: any) => (
+                          <button
+                            key={s.eventId}
+                            onClick={() => router.push(`/events/${s.eventId}`)}
+                            className="w-full flex items-center justify-between py-2 px-2 rounded-lg hover:bg-rkv-gray text-left group h-full"
+                          >
+                            <div>
+                              <span className="text-sm font-medium text-rkv-teal-dark group-hover:text-rkv-red transition-colors">
+                                {s.naam}
+                              </span>
+                              <p className="text-xs text-rkv-teal">{s.plaats}</p>
+                            </div>
+                            <span className="text-xs text-rkv-teal flex-shrink-0 ml-2">
+                              {new Date(s.datum).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </span>
-                            <p className="text-xs text-rkv-teal">{s.plaats}</p>
-                          </div>
-                          <span className="text-xs text-rkv-teal flex-shrink-0">
-                            {new Date(s.datum).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </span>
-                        </button>
-                      ))}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )
-              })
-            })()}
+                  )
+                })
+              })()}
+            </div>
           </Collapsible>
         )}
 

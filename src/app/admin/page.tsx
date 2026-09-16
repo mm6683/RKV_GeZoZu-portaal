@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
 import { RANK_ORDER, getRankConfig, getRankLabel } from '@/lib/ranks'
+import { useGridLayout } from '@/hooks/useGridLayout'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -14,6 +15,7 @@ export default function AdminPage() {
   const [filter, setFilter]       = useState<'all' | 'gezozu' | 'extern'>('gezozu')
   const [rankFilter, setRankFilter] = useState<string>('')
   const [loading, setLoading]     = useState(true)
+  const isGrid = useGridLayout()
 
   useEffect(() => { load() }, [])
 
@@ -61,7 +63,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-rkv-gray">
       <Navbar naam={me.volledigeNaam} id={me.id} displayName={me.displayName} voornaam={me.voornaam} pfpUrl={me.pfpUrl} isAdmin />
 
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+      <div className={`mx-auto px-4 py-6 space-y-5 transition-all duration-300 ${isGrid ? 'max-w-[1800px]' : 'max-w-3xl'}`}>
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-rkv-teal-dark">Admin paneel</h1>
           <button onClick={() => router.push('/admin/volunteers/create')} className="btn-blue text-sm">
@@ -119,7 +121,7 @@ export default function AdminPage() {
         </div>
 
         {/* Lijst */}
-        <div className="space-y-2">
+        <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
           {filtered.map(v => (
             <button
               key={v.id}
@@ -137,13 +139,13 @@ export default function AdminPage() {
                     {v.isExternal && <span className="badge bg-[#81A6AB] text-white text-xs">Extern</span>}
                     {v.isBlocked && <span className="badge bg-gray-400 text-white text-xs">Geblokkeerd</span>}
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5">
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                     <span className="text-xs text-rkv-teal">{v.rkvId}</span>
-                    <span className="text-rkv-teal-dark/30">·</span>
+                    <span className="text-rkv-teal-dark/30 hidden sm:inline">·</span>
                     <span className="text-xs text-rkv-teal">{v.hoofdentiteit}</span>
                     {v.ranks?.length > 0 && (
                       <>
-                        <span className="text-rkv-teal-dark/30">·</span>
+                        <span className="text-rkv-teal-dark/30 hidden sm:inline">·</span>
                         <RankBadge ranks={v.ranks} size="sm" />
                       </>
                     )}

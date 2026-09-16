@@ -6,6 +6,7 @@ import EventCard from '@/components/EventCard'
 import RankBadge from '@/components/RankBadge'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import Collapsible from '@/components/Collapsible'
+import { useGridLayout } from '@/hooks/useGridLayout'
 
 type View = 'list' | 'calendar'
 
@@ -16,6 +17,7 @@ export default function Dashboard() {
   const [view, setView]     = useState<View>('list')
   const [calMonth, setCalMonth] = useState(new Date())
   const [loading, setLoading]   = useState(true)
+  const isGrid = useGridLayout()
 
   useEffect(() => {
     async function load() {
@@ -43,7 +45,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-rkv-gray">
       <Navbar naam={me.volledigeNaam} id={me.id} displayName={me.displayName} voornaam={me.voornaam} pfpUrl={me.pfpUrl} isAdmin={me.isAdmin} />
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+      <div className={`mx-auto px-4 py-6 space-y-5 transition-all duration-300 ${isGrid ? 'max-w-[1800px]' : 'max-w-2xl'}`}>
 
         {/* ── Profielkaart ─────────────────────────────────────── */}
         <div className="card cursor-pointer hover:shadow-card-hover transition-shadow"
@@ -101,33 +103,37 @@ export default function Dashboard() {
                 {thisMonth.length === 0 ? (
                   <p className="text-sm text-rkv-teal text-center py-6 capitalize">Geen events gepland voor {monthName}.</p>
                 ) : (
-                  thisMonth.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)
+                  <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
+                    {thisMonth.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)}
+                  </div>
                 )}
               </Collapsible>
 
               {otherGroups.length > 0 && (
                 <Collapsible title="Opkomende maanden" count={otherGroups.reduce((n, g) => n + g.events.length, 0)}>
-                  {(() => {
-                    let lastYearShown: number | null = null
-                    return otherGroups.map(g => {
-                      const showYearHeader = g.year !== curYear && lastYearShown !== g.year
-                      if (showYearHeader) lastYearShown = g.year
-                      const monthLabel = new Date(g.year, g.month, 1).toLocaleDateString('nl-BE', { month: 'long' })
-                      return (
-                        <div key={`${g.year}-${g.month}`}>
-                          {showYearHeader && (
-                            <div className="text-sm font-bold text-rkv-teal-dark mt-4 mb-2 first:mt-0">{g.year}</div>
-                          )}
-                          <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
-                            {monthLabel}:
+                  <div className="space-y-4">
+                    {(() => {
+                      let lastYearShown: number | null = null
+                      return otherGroups.map(g => {
+                        const showYearHeader = g.year !== curYear && lastYearShown !== g.year
+                        if (showYearHeader) lastYearShown = g.year
+                        const monthLabel = new Date(g.year, g.month, 1).toLocaleDateString('nl-BE', { month: 'long' })
+                        return (
+                          <div key={`${g.year}-${g.month}`}>
+                            {showYearHeader && (
+                              <div className="text-sm font-bold text-rkv-teal-dark mt-4 mb-2 first:mt-0">{g.year}</div>
+                            )}
+                            <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
+                              {monthLabel}:
+                            </div>
+                            <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
+                              {g.events.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)}
+                            </div>
                           </div>
-                          <div className="space-y-2">
-                            {g.events.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)}
-                          </div>
-                        </div>
-                      )
-                    })
-                  })()}
+                        )
+                      })
+                    })()}
+                  </div>
                 </Collapsible>
               )}
             </div>
