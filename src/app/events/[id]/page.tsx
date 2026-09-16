@@ -7,6 +7,7 @@ import RankBadge from '@/components/RankBadge'
 import StatusBadge from '@/components/StatusBadge'
 import { RANK_ORDER, getRankConfig, getRankEventLabel, getHighestRankIndex } from '@/lib/ranks'
 import type { AttendStatus } from '@/types'
+import { useGridLayout } from '@/hooks/useGridLayout'
 
 export default function EventDetailPage() {
   const router = useRouter()
@@ -25,6 +26,7 @@ export default function EventDetailPage() {
   const [repeatResult, setRepeatResult] = useState<any>(null)
   const [repeatError, setRepeatError] = useState<string | null>(null)
   const [openComments, setOpenComments] = useState<Set<string>>(new Set())
+  const isGrid = useGridLayout()
 
   useEffect(() => { loadData() }, [])
 
@@ -518,7 +520,7 @@ export default function EventDetailPage() {
             )}
           </div>
 
-          <div className="space-y-2">
+          <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}>
             {intern.map((a: any) => (
               <AttendeeRow key={a.volunteerId} attendee={a}
                 isMe={a.volunteerId === me?.id} isAdmin={me?.isAdmin}
@@ -535,7 +537,7 @@ export default function EventDetailPage() {
               <div className="mt-4 mb-2 text-xs font-medium text-rkv-teal uppercase tracking-wide">
                 Externe vrijwilligers
               </div>
-              <div className="space-y-2">
+              <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}>
                 {extern.map((a: any) => (
                   <AttendeeRow key={a.volunteerId} attendee={a}
                     isMe={a.volunteerId === me?.id} isAdmin={me?.isAdmin}

@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
 import { RANK_ORDER, getRankConfig, getRankLabel } from '@/lib/ranks'
+import { useGridLayout } from '@/hooks/useGridLayout'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -14,6 +15,7 @@ export default function AdminPage() {
   const [filter, setFilter]       = useState<'all' | 'gezozu' | 'extern'>('gezozu')
   const [rankFilter, setRankFilter] = useState<string>('')
   const [loading, setLoading]     = useState(true)
+  const isGrid = useGridLayout()
 
   useEffect(() => { load() }, [])
 
@@ -119,7 +121,7 @@ export default function AdminPage() {
         </div>
 
         {/* Lijst */}
-        <div className="space-y-2">
+        <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3' : 'space-y-2'}>
           {filtered.map(v => (
             <button
               key={v.id}

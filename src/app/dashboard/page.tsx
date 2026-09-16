@@ -6,6 +6,7 @@ import EventCard from '@/components/EventCard'
 import RankBadge from '@/components/RankBadge'
 import VolunteerAvatar from '@/components/VolunteerAvatar'
 import Collapsible from '@/components/Collapsible'
+import { useGridLayout } from '@/hooks/useGridLayout'
 
 type View = 'list' | 'calendar'
 
@@ -16,6 +17,7 @@ export default function Dashboard() {
   const [view, setView]     = useState<View>('list')
   const [calMonth, setCalMonth] = useState(new Date())
   const [loading, setLoading]   = useState(true)
+  const isGrid = useGridLayout()
 
   useEffect(() => {
     async function load() {
@@ -121,7 +123,7 @@ export default function Dashboard() {
                           <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
                             {monthLabel}:
                           </div>
-                          <div className="space-y-2">
+                          <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}>
                             {g.events.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)}
                           </div>
                         </div>

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import VolunteerAvatar from './VolunteerAvatar'
 import ThemeToggle from './ThemeToggle'
+import GridLayoutToggle from './GridLayoutToggle'
 
 interface Props {
   naam: string
@@ -61,6 +62,7 @@ export default function Navbar({ naam, id, displayName, voornaam, pfpUrl, isAdmi
 
       {/* Thema + gebruiker */}
       <div className="flex items-center gap-1">
+        <GridLayoutToggle />
         <ThemeToggle />
 
         <div className="relative">

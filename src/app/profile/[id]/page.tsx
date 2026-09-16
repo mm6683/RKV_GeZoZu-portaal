@@ -6,6 +6,7 @@ import VolunteerAvatar from '@/components/VolunteerAvatar'
 import RankBadge from '@/components/RankBadge'
 import Collapsible from '@/components/Collapsible'
 import { QUAL_BADGES } from '@/lib/ranks'
+import { useGridLayout } from '@/hooks/useGridLayout'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -14,6 +15,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [notAllowed, setNotAllowed] = useState(false)
+  const isGrid = useGridLayout()
 
   useEffect(() => {
     async function load() {
@@ -153,9 +155,9 @@ export default function ProfilePage() {
                     >
                       {cfg.label}
                     </div>
-                    <div className="space-y-1.5">
+                    <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-1.5'}>
                       {items.map((q: any) => (
-                        <div key={q.id} className="flex items-center justify-between bg-rkv-gray rounded-lg px-3 py-2">
+                        <div key={q.id} className="flex items-center justify-between bg-rkv-gray rounded-lg px-3 py-2 h-full">
                           <span className="text-sm text-rkv-teal-dark font-medium">{q.naam}</span>
                           {q.geldigTot && (
                             <span className="text-xs text-rkv-teal">geldig tot {q.geldigTot}</span>
@@ -177,9 +179,9 @@ export default function ProfilePage() {
         {profile.functions.length > 0 && (
           <div className="card">
             <h2 className="section-title">RKV Functies</h2>
-            <div className="space-y-2">
+            <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}>
               {profile.functions.map((f: any) => (
-                <div key={f.id} className="bg-rkv-gray rounded-lg px-3 py-2.5">
+                <div key={f.id} className="bg-rkv-gray rounded-lg px-3 py-2.5 h-full">
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="text-sm font-semibold text-rkv-teal-dark">{f.functie}</p>
@@ -210,7 +212,7 @@ export default function ProfilePage() {
         {(isOwnProfile || me.isAdmin) && (
           <div className="card">
             <h2 className="section-title">Contactinfo</h2>
-            <div className="space-y-2">
+            <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}>
               {profile.emailWerk && <ContactRow icon="✉️" label="E-mail werk" value={profile.emailWerk} />}
               {profile.gsm && <ContactRow icon="📱" label="GSM" value={profile.gsm} />}
               {profile.rkvId && <ContactRow icon="🪪" label="RKV ID" value={profile.rkvId} />}
@@ -239,7 +241,7 @@ export default function ProfilePage() {
                     <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
                       {monthLabel}:
                     </div>
-                    <div className="space-y-1">
+                    <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-1'}>
                       {g.shifts.map((s: any) => (
                         <button
                           key={s.eventId}
@@ -283,7 +285,7 @@ export default function ProfilePage() {
                     <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
                       {monthLabel}:
                     </div>
-                    <div className="space-y-1">
+                    <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-1'}>
                       {g.shifts.map((s: any) => (
                         <button
                           key={s.eventId}
