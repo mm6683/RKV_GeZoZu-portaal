@@ -45,7 +45,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-rkv-gray">
       <Navbar naam={me.volledigeNaam} id={me.id} displayName={me.displayName} voornaam={me.voornaam} pfpUrl={me.pfpUrl} isAdmin={me.isAdmin} />
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+      <div className={`mx-auto px-4 py-6 space-y-5 transition-all duration-300 ${isGrid ? 'max-w-[1800px]' : 'max-w-2xl'}`}>
 
         {/* ── Profielkaart ─────────────────────────────────────── */}
         <div className="card cursor-pointer hover:shadow-card-hover transition-shadow"
@@ -123,7 +123,7 @@ export default function Dashboard() {
                           <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
                             {monthLabel}:
                           </div>
-                          <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}>
+                          <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
                             {g.events.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)}
                           </div>
                         </div>

@@ -296,7 +296,7 @@ export default function EventDetailPage() {
     <div className="min-h-screen bg-rkv-gray">
       <Navbar naam={me?.volledigeNaam} id={me?.id} displayName={me?.displayName} voornaam={me?.voornaam} pfpUrl={me?.pfpUrl} isAdmin={me?.isAdmin} />
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+      <div className={`mx-auto px-4 py-6 space-y-5 transition-all duration-300 ${isGrid ? 'max-w-[1800px]' : 'max-w-2xl'}`}>
         <button
           onClick={() => { if (window.history.length > 1) router.back(); else router.push('/dashboard') }}
           className="text-rkv-teal text-sm flex items-center gap-1 hover:text-rkv-red"
@@ -520,7 +520,7 @@ export default function EventDetailPage() {
             )}
           </div>
 
-          <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}>
+          <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
             {intern.map((a: any) => (
               <AttendeeRow key={a.volunteerId} attendee={a}
                 isMe={a.volunteerId === me?.id} isAdmin={me?.isAdmin}
@@ -537,7 +537,7 @@ export default function EventDetailPage() {
               <div className="mt-4 mb-2 text-xs font-medium text-rkv-teal uppercase tracking-wide">
                 Externe vrijwilligers
               </div>
-              <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}>
+              <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
                 {extern.map((a: any) => (
                   <AttendeeRow key={a.volunteerId} attendee={a}
                     isMe={a.volunteerId === me?.id} isAdmin={me?.isAdmin}

@@ -73,7 +73,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-rkv-gray">
       <Navbar naam={me.volledigeNaam} id={me.id} displayName={me.displayName} voornaam={me.voornaam} pfpUrl={me.pfpUrl} isAdmin={me.isAdmin} />
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+      <div className={`mx-auto px-4 py-6 space-y-5 transition-all duration-300 ${isGrid ? 'max-w-[1800px]' : 'max-w-2xl'}`}>
         {/* Terug */}
         <button
           onClick={() => router.back()}
@@ -155,7 +155,7 @@ export default function ProfilePage() {
                     >
                       {cfg.label}
                     </div>
-                    <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-1.5'}>
+                    <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-1.5'}>
                       {items.map((q: any) => (
                         <div key={q.id} className="flex items-center justify-between bg-rkv-gray rounded-lg px-3 py-2 h-full">
                           <span className="text-sm text-rkv-teal-dark font-medium">{q.naam}</span>
@@ -179,7 +179,7 @@ export default function ProfilePage() {
         {profile.functions.length > 0 && (
           <div className="card">
             <h2 className="section-title">RKV Functies</h2>
-            <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}>
+            <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
               {profile.functions.map((f: any) => (
                 <div key={f.id} className="bg-rkv-gray rounded-lg px-3 py-2.5 h-full">
                   <div className="flex items-start justify-between">
@@ -212,7 +212,7 @@ export default function ProfilePage() {
         {(isOwnProfile || me.isAdmin) && (
           <div className="card">
             <h2 className="section-title">Contactinfo</h2>
-            <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}>
+            <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
               {profile.emailWerk && <ContactRow icon="✉️" label="E-mail werk" value={profile.emailWerk} />}
               {profile.gsm && <ContactRow icon="📱" label="GSM" value={profile.gsm} />}
               {profile.rkvId && <ContactRow icon="🪪" label="RKV ID" value={profile.rkvId} />}
@@ -241,7 +241,7 @@ export default function ProfilePage() {
                     <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
                       {monthLabel}:
                     </div>
-                    <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-1'}>
+                    <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-1'}>
                       {g.shifts.map((s: any) => (
                         <button
                           key={s.eventId}
@@ -285,7 +285,7 @@ export default function ProfilePage() {
                     <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
                       {monthLabel}:
                     </div>
-                    <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-1'}>
+                    <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-1'}>
                       {g.shifts.map((s: any) => (
                         <button
                           key={s.eventId}

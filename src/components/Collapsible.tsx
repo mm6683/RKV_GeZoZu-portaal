@@ -53,7 +53,7 @@ export default function Collapsible({ title, count, defaultOpen = false, childre
         <span className={`text-rkv-teal transition-transform ${open ? 'rotate-180' : ''}`}>▾</span>
       </button>
       {open && (
-        <div className={`px-5 pb-5 border-t border-rkv-gray pt-4 ${isGrid ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-2'}`}>
+        <div className={`px-5 pb-5 border-t border-rkv-gray pt-4 ${isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}`}>
           {children}
         </div>
       )}

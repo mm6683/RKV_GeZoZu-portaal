@@ -63,7 +63,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-rkv-gray">
       <Navbar naam={me.volledigeNaam} id={me.id} displayName={me.displayName} voornaam={me.voornaam} pfpUrl={me.pfpUrl} isAdmin />
 
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+      <div className={`mx-auto px-4 py-6 space-y-5 transition-all duration-300 ${isGrid ? 'max-w-[1800px]' : 'max-w-3xl'}`}>
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-rkv-teal-dark">Admin paneel</h1>
           <button onClick={() => router.push('/admin/volunteers/create')} className="btn-blue text-sm">
@@ -121,7 +121,7 @@ export default function AdminPage() {
         </div>
 
         {/* Lijst */}
-        <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3' : 'space-y-2'}>
+        <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
           {filtered.map(v => (
             <button
               key={v.id}
