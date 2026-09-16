@@ -103,33 +103,37 @@ export default function Dashboard() {
                 {thisMonth.length === 0 ? (
                   <p className="text-sm text-rkv-teal text-center py-6 capitalize">Geen events gepland voor {monthName}.</p>
                 ) : (
-                  thisMonth.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)
+                  <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
+                    {thisMonth.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)}
+                  </div>
                 )}
               </Collapsible>
 
               {otherGroups.length > 0 && (
                 <Collapsible title="Opkomende maanden" count={otherGroups.reduce((n, g) => n + g.events.length, 0)}>
-                  {(() => {
-                    let lastYearShown: number | null = null
-                    return otherGroups.map(g => {
-                      const showYearHeader = g.year !== curYear && lastYearShown !== g.year
-                      if (showYearHeader) lastYearShown = g.year
-                      const monthLabel = new Date(g.year, g.month, 1).toLocaleDateString('nl-BE', { month: 'long' })
-                      return (
-                        <div key={`${g.year}-${g.month}`}>
-                          {showYearHeader && (
-                            <div className="text-sm font-bold text-rkv-teal-dark mt-4 mb-2 first:mt-0">{g.year}</div>
-                          )}
-                          <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
-                            {monthLabel}:
+                  <div className="space-y-4">
+                    {(() => {
+                      let lastYearShown: number | null = null
+                      return otherGroups.map(g => {
+                        const showYearHeader = g.year !== curYear && lastYearShown !== g.year
+                        if (showYearHeader) lastYearShown = g.year
+                        const monthLabel = new Date(g.year, g.month, 1).toLocaleDateString('nl-BE', { month: 'long' })
+                        return (
+                          <div key={`${g.year}-${g.month}`}>
+                            {showYearHeader && (
+                              <div className="text-sm font-bold text-rkv-teal-dark mt-4 mb-2 first:mt-0">{g.year}</div>
+                            )}
+                            <div className="text-xs font-semibold text-rkv-teal uppercase tracking-wide mb-2 mt-3 first:mt-0">
+                              {monthLabel}:
+                            </div>
+                            <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
+                              {g.events.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)}
+                            </div>
                           </div>
-                          <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
-                            {g.events.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)}
-                          </div>
-                        </div>
-                      )
-                    })
-                  })()}
+                        )
+                      })
+                    })()}
+                  </div>
                 </Collapsible>
               )}
             </div>
