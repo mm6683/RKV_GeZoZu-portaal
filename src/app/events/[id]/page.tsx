@@ -524,7 +524,7 @@ export default function EventDetailPage() {
             {intern.map((a: any) => (
               <AttendeeRow key={a.volunteerId} attendee={a}
                 isMe={a.volunteerId === me?.id} isAdmin={me?.isAdmin}
-                loading={statusLoading === a.volunteerId} disabled={!!event.isCancelled}
+                loading={statusLoading === a.volunteerId} disabled={!!event.isCancelled} isGrid={isGrid}
                 onStatusChange={s => setStatus(a.volunteerId, s)}
                 commentOpen={openComments.has(a.volunteerId)}
                 onToggleComment={() => toggleComment(a.volunteerId)}
@@ -541,7 +541,7 @@ export default function EventDetailPage() {
                 {extern.map((a: any) => (
                   <AttendeeRow key={a.volunteerId} attendee={a}
                     isMe={a.volunteerId === me?.id} isAdmin={me?.isAdmin}
-                    loading={statusLoading === a.volunteerId} disabled={!!event.isCancelled}
+                    loading={statusLoading === a.volunteerId} disabled={!!event.isCancelled} isGrid={isGrid}
                     onStatusChange={s => setStatus(a.volunteerId, s)}
                     onRemove={me?.isAdmin && !event.isCancelled ? () => removeExternal(a.volunteerId) : undefined}
                     commentOpen={openComments.has(a.volunteerId)}
@@ -566,9 +566,9 @@ function InfoRow({ icon, label, value, color }: { icon: string; label: string; v
   )
 }
 
-function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusChange, onRemove, commentOpen, onToggleComment, onSaveComment }: {
+function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, isGrid, onStatusChange, onRemove, commentOpen, onToggleComment, onSaveComment }: {
   attendee: any; isMe: boolean; isAdmin: boolean; loading: boolean
-  disabled: boolean; onStatusChange: (s: AttendStatus) => void; onRemove?: () => void
+  disabled: boolean; isGrid?: boolean; onStatusChange: (s: AttendStatus) => void; onRemove?: () => void
   commentOpen?: boolean; onToggleComment?: () => void; onSaveComment?: (v: string) => void | Promise<void>
 }) {
   const router = useRouter()
@@ -584,96 +584,126 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, onStatusCh
   // de opmerking bekijken/bewerken.
   const canEditComment = canEdit && !!onToggleComment && !!onSaveComment
 
+  // Naam + rang(en) + entiteit + opmerking — identiek in lijst- en
+  // grid-modus, enkel de plaatsing van de statusknoppen errond verschilt
+  // hieronder (zie isGrid).
+  const infoBlock = (
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center gap-1.5">
+        {isAdmin ? (
+          // Klikbare naam voor admins — gaat naar het profiel van de
+          // vrijwilliger, net zoals bv. de rijen in het admin-paneel.
+          <button
+            onClick={() => router.push(`/profile/${a.volunteerId}`)}
+            title="Profiel bekijken"
+            className="text-sm font-semibold text-rkv-teal-dark truncate text-left hover:text-rkv-red hover:underline transition-colors"
+          >
+            {a.displayName || a.volledigeNaam}
+          </button>
+        ) : (
+          <span className="text-sm font-semibold text-rkv-teal-dark truncate">
+            {a.displayName || a.volledigeNaam}
+          </span>
+        )}
+        {isMe && <span className="text-xs text-rkv-red font-medium">(jij)</span>}
+      </div>
+      {/* flex-wrap hier is essentieel: in smalle grid-kolommen is er niet
+          altijd plaats voor alle rang-badges + entiteit op één rij, en
+          zonder wrap werd de entiteit-tekst (bv. "GENK-ZONHOVEN-ZUTENDAAL")
+          tot bijna niks platgeduwd en over 3 regels gebroken. */}
+      <div className="flex items-center gap-x-2 gap-y-1 mt-0.5 flex-wrap">
+        <RankBadge ranks={a.ranks} size="sm" variant="event" />
+        <span className="text-xs text-rkv-teal">{a.hoofdentiteit}</span>
+      </div>
+
+      {/* Opmerking — verschijnt onder de vrijwilliger, met wat extra
+          ruimte als er effectief iets is ingevuld. Het potloodje is klein
+          en onopvallend en staat vlak naast (of in de plaats van) de tekst. */}
+      {canEditComment && (
+        commentOpen ? (
+          <div className="mt-1.5" onClick={e => e.stopPropagation()}>
+            <InlineCommentEditor
+              value={a.opmerking || ''}
+              onSave={onSaveComment!}
+              onDone={() => onToggleComment!()}
+              placeholder="Opmerking toevoegen…"
+            />
+          </div>
+        ) : (
+          <div className={`flex items-start gap-1.5 ${a.opmerking ? 'mt-1.5' : 'mt-0.5'}`}>
+            {a.opmerking && (
+              <span className="text-xs text-rkv-teal-dark/70 italic leading-snug break-words">
+                {a.opmerking}
+              </span>
+            )}
+            <button
+              onClick={onToggleComment}
+              title={a.opmerking ? 'Opmerking bewerken' : 'Opmerking toevoegen'}
+              className="text-rkv-teal/60 hover:text-rkv-teal transition-colors text-sm leading-none shrink-0"
+            >
+              ✎
+            </button>
+          </div>
+        )
+      )}
+    </div>
+  )
+
+  const statusControls = canEdit ? (
+    <div className="flex gap-1 items-center">
+      {STATUS_BTNS.map(({ status, label, activeColor }) => {
+        const isActive = a.status === status
+        return (
+          <button key={status} disabled={loading} onClick={() => onStatusChange(status)}
+            title={status}
+            className="w-7 h-7 rounded-lg text-xs font-bold transition-all"
+            style={isActive
+              ? { backgroundColor: activeColor, color: '#fff' }
+              : { backgroundColor: '#EEF1F4', color: '#223A3C' }}>
+            {label}
+          </button>
+        )
+      })}
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          title="Externe vrijwilliger verwijderen"
+          className="w-7 h-7 rounded-lg text-xs font-bold transition-all ml-1"
+          style={{ backgroundColor: '#FEE2E2', color: '#EC2127' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#EC2127'; (e.currentTarget as HTMLButtonElement).style.color = '#fff' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FEE2E2'; (e.currentTarget as HTMLButtonElement).style.color = '#EC2127' }}
+        >
+          ✕
+        </button>
+      )}
+    </div>
+  ) : (
+    <StatusBadge status={a.status} compact />
+  )
+
+  // Grid-modus: avatar+naam/badges bovenaan, statusknoppen op een eigen
+  // rij onderaan (i.p.v. ernaast) — anders moeten avatar, naam, badges,
+  // entiteit én 3 knoppen allemaal samen in een kolom van ±300px passen,
+  // wat exact de opeengepakte rommel uit het scherm hierboven veroorzaakt.
+  if (isGrid) {
+    return (
+      <div className={`h-full flex flex-col gap-2 p-2.5 rounded-xl transition-colors ${isMe ? 'bg-rkv-red/5 ring-1 ring-rkv-red/20' : 'hover:bg-rkv-gray'}`}>
+        <div className="flex items-start gap-3">
+          <VolunteerAvatar pfpUrl={a.pfpUrl} naam={a.volledigeNaam} size={36} />
+          {infoBlock}
+        </div>
+        <div className="flex items-center justify-end mt-auto pt-2 border-t border-rkv-gray-mid/40">
+          {statusControls}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={`flex items-start gap-3 p-2.5 rounded-xl transition-colors ${isMe ? 'bg-rkv-red/5 ring-1 ring-rkv-red/20' : 'hover:bg-rkv-gray'}`}>
       <VolunteerAvatar pfpUrl={a.pfpUrl} naam={a.volledigeNaam} size={36} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          {isAdmin ? (
-            // Klikbare naam voor admins — gaat naar het profiel van de
-            // vrijwilliger, net zoals bv. de rijen in het admin-paneel.
-            <button
-              onClick={() => router.push(`/profile/${a.volunteerId}`)}
-              title="Profiel bekijken"
-              className="text-sm font-semibold text-rkv-teal-dark truncate text-left hover:text-rkv-red hover:underline transition-colors"
-            >
-              {a.displayName || a.volledigeNaam}
-            </button>
-          ) : (
-            <span className="text-sm font-semibold text-rkv-teal-dark truncate">
-              {a.displayName || a.volledigeNaam}
-            </span>
-          )}
-          {isMe && <span className="text-xs text-rkv-red font-medium">(jij)</span>}
-        </div>
-        <div className="flex items-center gap-2 mt-0.5">
-          <RankBadge ranks={a.ranks} size="sm" variant="event" />
-          <span className="text-xs text-rkv-teal">{a.hoofdentiteit}</span>
-        </div>
-
-        {/* Opmerking — verschijnt onder de vrijwilliger, met wat extra
-            ruimte als er effectief iets is ingevuld. Het potloodje is klein
-            en onopvallend en staat vlak naast (of in de plaats van) de tekst. */}
-        {canEditComment && (
-          commentOpen ? (
-            <div className="mt-1.5" onClick={e => e.stopPropagation()}>
-              <InlineCommentEditor
-                value={a.opmerking || ''}
-                onSave={onSaveComment!}
-                onDone={() => onToggleComment!()}
-                placeholder="Opmerking toevoegen…"
-              />
-            </div>
-          ) : (
-            <div className={`flex items-start gap-1.5 ${a.opmerking ? 'mt-1.5' : 'mt-0.5'}`}>
-              {a.opmerking && (
-                <span className="text-xs text-rkv-teal-dark/70 italic leading-snug break-words">
-                  {a.opmerking}
-                </span>
-              )}
-              <button
-                onClick={onToggleComment}
-                title={a.opmerking ? 'Opmerking bewerken' : 'Opmerking toevoegen'}
-                className="text-rkv-teal/60 hover:text-rkv-teal transition-colors text-sm leading-none shrink-0"
-              >
-                ✎
-              </button>
-            </div>
-          )
-        )}
-      </div>
-
-      {canEdit ? (
-        <div className="flex gap-1 items-center">
-          {STATUS_BTNS.map(({ status, label, activeColor }) => {
-            const isActive = a.status === status
-            return (
-              <button key={status} disabled={loading} onClick={() => onStatusChange(status)}
-                title={status}
-                className="w-7 h-7 rounded-lg text-xs font-bold transition-all"
-                style={isActive
-                  ? { backgroundColor: activeColor, color: '#fff' }
-                  : { backgroundColor: '#EEF1F4', color: '#223A3C' }}>
-                {label}
-              </button>
-            )
-          })}
-          {onRemove && (
-            <button
-              onClick={onRemove}
-              title="Externe vrijwilliger verwijderen"
-              className="w-7 h-7 rounded-lg text-xs font-bold transition-all ml-1"
-              style={{ backgroundColor: '#FEE2E2', color: '#EC2127' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#EC2127'; (e.currentTarget as HTMLButtonElement).style.color = '#fff' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FEE2E2'; (e.currentTarget as HTMLButtonElement).style.color = '#EC2127' }}
-            >
-              ✕
-            </button>
-          )}
-        </div>
-      ) : (
-        <StatusBadge status={a.status} compact />
-      )}
+      {infoBlock}
+      {statusControls}
     </div>
   )
 }
