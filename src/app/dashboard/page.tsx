@@ -104,7 +104,7 @@ export default function Dashboard() {
                   <p className="text-sm text-rkv-teal text-center py-6 capitalize">Geen events gepland voor {monthName}.</p>
                 ) : (
                   <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
-                    {thisMonth.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)}
+                    {thisMonth.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} isGrid={isGrid} />)}
                   </div>
                 )}
               </Collapsible>
@@ -127,7 +127,7 @@ export default function Dashboard() {
                               {monthLabel}:
                             </div>
                             <div className={isGrid ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3' : 'space-y-2'}>
-                              {g.events.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} />)}
+                              {g.events.map(e => <EventCard key={e.id} {...e} isAdmin={me.isAdmin} isGrid={isGrid} />)}
                             </div>
                           </div>
                         )
