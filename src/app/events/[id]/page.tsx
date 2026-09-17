@@ -692,7 +692,7 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, isGrid, on
           <VolunteerAvatar pfpUrl={a.pfpUrl} naam={a.volledigeNaam} size={36} />
           {infoBlock}
         </div>
-        <div className="flex items-center justify-end mt-auto pt-2 border-t border-rkv-gray-mid/40">
+        <div className="flex items-center justify-end mt-auto pb-1 border-b border-rkv-gray-mid/40">
           {statusControls}
         </div>
       </div>
