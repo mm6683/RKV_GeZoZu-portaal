@@ -687,12 +687,12 @@ function AttendeeRow({ attendee: a, isMe, isAdmin, loading, disabled, isGrid, on
   // wat exact de opeengepakte rommel uit het scherm hierboven veroorzaakt.
   if (isGrid) {
     return (
-      <div className={`h-full flex flex-col gap-2 p-2.5 rounded-xl transition-colors ${isMe ? 'bg-rkv-red/5 ring-1 ring-rkv-red/20' : 'hover:bg-rkv-gray'}`}>
+      <div className={`h-full flex flex-col gap-2 p-2.5 rounded-xl ring-1 transition-colors ${isMe ? 'bg-rkv-red/5 ring-rkv-red/20' : 'ring-rkv-gray-mid/40 hover:bg-rkv-gray'}`}>
         <div className="flex items-start gap-3">
           <VolunteerAvatar pfpUrl={a.pfpUrl} naam={a.volledigeNaam} size={36} />
           {infoBlock}
         </div>
-        <div className="flex items-center justify-end mt-auto pb-1 border-b border-rkv-gray-mid/40">
+        <div className="flex items-center justify-end mt-auto pt-1">
           {statusControls}
         </div>
       </div>
