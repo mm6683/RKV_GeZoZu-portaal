@@ -129,11 +129,11 @@ export default function ProfilePage() {
           <div className="grid grid-cols-2 gap-3 mt-6">
             <div className="bg-rkv-gray rounded-xl p-4 text-center">
               <div className="text-3xl font-bold text-rkv-red">{profile.shiftenDitJaar}</div>
-              <div className="text-xs text-rkv-teal mt-1">shifts dit jaar</div>
+              <div className="text-xs text-rkv-teal mt-1">shiften gedaan dit jaar</div>
             </div>
             <div className="bg-rkv-gray rounded-xl p-4 text-center">
               <div className="text-3xl font-bold text-rkv-teal-dark">{profile.totalShiften}</div>
-              <div className="text-xs text-rkv-teal mt-1">shifts totaal</div>
+              <div className="text-xs text-rkv-teal mt-1">shiften gedaan totaal</div>
             </div>
           </div>
         </div>

@@ -63,11 +63,11 @@ export default function Dashboard() {
           <div className="grid grid-cols-2 gap-3 mt-5">
             <div className="bg-rkv-gray rounded-xl p-4 text-center">
               <div className="text-3xl font-bold text-rkv-red">{me.shiftenDitJaar}</div>
-              <div className="text-xs text-rkv-teal mt-1">shifts dit jaar</div>
+              <div className="text-xs text-rkv-teal mt-1">shiften gedaan dit jaar</div>
             </div>
             <div className="bg-rkv-gray rounded-xl p-4 text-center">
               <div className="text-3xl font-bold text-rkv-teal-dark">{thisMonth.length}</div>
-              <div className="text-xs text-rkv-teal mt-1">events deze maand</div>
+              <div className="text-xs text-rkv-teal mt-1">opkomende evenementen deze maand</div>
             </div>
           </div>
         </div>
